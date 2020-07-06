@@ -1,0 +1,175 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+crossorigin=""/>
+ <!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+<script src="https://unpkg.com/leaflet-gpx@1.5.0/gpx.js"></script>
+<script src="https://github.com/Oliv/leaflet-polycolor/raw/master/dist/leaflet-polycolor.min.js"></script>
+{% endblock %}
+
+{% block styles %}
+    {{super()}}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script src="{{ url_for('static', filename='Polyline.encoded.js') }}"></script>
+<script>
+
+
+    // ==========
+    // Handle map
+    // ==========
+    // Available tiles definition
+    var cyclosm = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+        minZoom: 0,
+        maxZoom: 20,
+    });
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+        minZoom: 0,
+        maxZoom: 19,
+    });
+    var piano = L.tileLayer('https://{s}.piano.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png', {
+        attribution: 'Tiles <a href="https://github.com/tilery/pianoforte">PianoFr</a> | &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+        minZoom: 0,
+        maxZoom: 20,
+    });
+    var ocm = L.tileLayer('https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+        minZoom: 0,
+        maxZoom: 18,
+    });
+    var otm = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+        minZoom: 0,
+        maxZoom: 18,
+    });
+    var cyclosm_lite = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm-lite/{z}/{x}/{y}.png', {
+        attribution: 'CyclOSM Lite',
+        minZoom: 11,
+        maxZoom: 20,
+    });
+    var waymarked_trails = L.tileLayer('https://tile.waymarkedtrails.org/cycling/{z}/{x}/{y}.png', {
+        attribution: '<a href="https://cycling.waymarkedtrails.org/">https://cycling.waymarkedtrails.org/</a>',
+        minZoom: 0,
+        maxZoom: 18,
+    });
+
+    var map = L.map('mapid', { layers: [cyclosm] });
+    //cyclosm.addTo(map)
+
+    //if (!map.restoreView()) {
+    map.setView([42.2, -71.88], 8);
+    //}
+
+    //map.attributionControl.setPrefix('<a href="http://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> | <a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> ' + VERSION);
+
+    // Set up layers control
+    var baseMaps = {
+        "CyclOSM": cyclosm,
+        "OpenStreetMap.org": osm,
+        "OpenCycleMap": ocm,
+        "OpenTopoMap": otm,
+        "OSM Piano": piano,
+    };
+
+    var overlayMaps = {
+        "Waymarked Trails": waymarked_trails,
+        "CyclOSM Lite": cyclosm_lite
+    };
+
+    L.control.layers(baseMaps, overlayMaps, { collapsed: true }).addTo(map);
+
+    // Set up hash plugin
+    var allMapLayers = {
+        'cyclosm': cyclosm,
+        'piano': piano,
+        'openstreetmap': osm,
+        'opencyclemap': ocm,
+        'opentopomap': otm,
+        'waymarkedtrails': waymarked_trails,
+        'cyclosmlite': cyclosm_lite,
+    };
+    L.hash(map, allMapLayers);
+
+
+    /*
+        L.tileLayer(
+            'https://{s}.tile.openstreetmap.org/cyclosm/{z}/{x}/{y}.png', 
+            {
+                maxZoom: 20,
+                attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }
+        ).addTo(map);
+    */
+
+    /*
+        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+            maxZoom: 18
+        }).addTo(map);
+    */
+
+    osm_mapbox = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+            '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+            'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        id: 'mapbox/streets-v11',
+        tileSize: 512,
+        zoomOffset: -1
+    });
+
+
+    /* 	L.marker([51.5, -0.09]).addTo(mymap)
+            .bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
+    
+        L.circle([51.508, -0.11], 500, {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.5
+        }).addTo(mymap).bindPopup("I am a circle.");
+    
+        L.polygon([
+            [51.509, -0.08],
+            [51.503, -0.06],
+            [51.51, -0.047]
+        ]).addTo(mymap).bindPopup("I am a polygon.");
+    
+     */
+    var popup = L.popup();
+
+    function onMapClick(e) {
+        popup
+            .setLatLng(e.latlng)
+            .setContent("You clicked the map at " + e.latlng.toString())
+            .openOn(mymap);
+    }
+
+    mymap.on('click', onMapClick);
+
+</script>
+{% endblock %}
+
+{% block content %}
+<style>
+    .leaflet-control-layers-list {
+        text-align: left;
+    }
+    
+</style>
+
+ <!-- <div id="mapid" style="width: 100%; height: 800px;"></div>  -->
+<div id="mapid"></div> 
+
+
+{% endblock %}
