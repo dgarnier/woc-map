@@ -10,7 +10,6 @@ crossorigin=""/>
    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
    crossorigin=""></script>
 <script src="https://unpkg.com/leaflet-gpx@1.5.0/gpx.js"></script>
-<script src="https://github.com/Oliv/leaflet-polycolor/raw/master/dist/leaflet-polycolor.min.js"></script>
 {% endblock %}
 
 {% block styles %}
@@ -69,6 +68,15 @@ crossorigin=""/>
     var map = L.map('mapid', { layers: [cyclosm] });
     //cyclosm.addTo(map)
     
+    var popup_route = L.popup();
+
+    function onPolylineClick(e) {
+        popup_route
+            .setLatLng(e.latlng)
+            .setContent("You on a course")
+            .openOn(map);
+    }
+
     function add_geojson( map, style, url) {
         // return a promise
         return $.ajax({
@@ -78,7 +86,9 @@ crossorigin=""/>
             tryCount : 0,
             retryLimit : 5,
             success : function(json) {
-                L.geoJson(json, style).addTo(map);
+                var gJ = L.geoJson(json, style).addTo(map);
+                gJ.on('click', onPolylineClick);
+
             },
             error : function(xhr, textStatus, errorThrown) {
                 if (textStatus == 'timeout') {
@@ -101,7 +111,7 @@ crossorigin=""/>
     add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/_B_lackLivesMatter.geojson') }}");
     add_geojson(map, {color:'green'},   "{{ url_for('static', filename='routes/B_l_ackLivesMatter.geojson') }}");
     add_geojson(map, {color:'red'},     "{{ url_for('static', filename='routes/Bl_a_ckLivesMatter.geojson') }}");
-    add_geojson(map, {color:'cyan'},    "{{ url_for('static', filename='routes/Bla_c_kLivesMatter.geojson') }}");
+    add_geojson(map, {color:'brown'},    "{{ url_for('static', filename='routes/Bla_c_kLivesMatter.geojson') }}");
     add_geojson(map, {color:'magenta'}, "{{ url_for('static', filename='routes/Blac_k_LivesMatter.geojson') }}");
     add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/Black_L_ivesMatter.geojson') }}");
     add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackL_i_vesMatter.geojson') }}");
@@ -204,10 +214,10 @@ crossorigin=""/>
         popup
             .setLatLng(e.latlng)
             .setContent("You clicked the map at " + e.latlng.toString())
-            .openOn(mymap);
+            .openOn(map);
     }
 
-    mymap.on('click', onMapClick);
+    map.on('click', onMapClick);
 
 </script>
 {% endblock %}
@@ -220,8 +230,6 @@ crossorigin=""/>
     
 </style>
 
- <!-- <div id="mapid" style="width: 100%; height: 800px;"></div>  -->
 <div id="mapid"></div> 
-
 
 {% endblock %}
