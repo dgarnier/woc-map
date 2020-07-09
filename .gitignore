@@ -1,7 +1,7 @@
 __pycache__
 .ipynb_checkpoints
 sandbox
-
+log/*
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
