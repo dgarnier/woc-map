@@ -1,6 +1,6 @@
 from flask import flash, request, redirect, url_for
 from flask_login import current_user
-from authlib.integrations.flask_client import OAuth as OAuthOrig
+from authlib.integrations.flask_client import OAuth
 from loginpass import Strava, create_flask_blueprint
 from flask_login import login_user
 
@@ -27,15 +27,6 @@ def on_token_update(sender, name, token, refresh_token=None,
             return
 
         ath.auth_token = token
-
-
-class OAuth(OAuthOrig):
-    def init_app(self, app, **kwargs):
-        super(OAuth, self).init_app(app, fetch_token=fetch_token,
-                                    update_token=on_token_update, **kwargs)
-
-
-oauth = OAuth()
 
 
 def handle_authorize(remote, token, user_info):
@@ -78,5 +69,11 @@ def handle_authorize(remote, token, user_info):
         return redirect(url_for('map'))
 
 
+# get the oauth session, which also has a requests interface
+oauth = OAuth(fetch_token=fetch_token,
+              update_token=on_token_update)
+
+# ask for activity read
+Strava.OAUTH_CONFIG['client_kwargs']['scope'] = 'read,activity:read'
 # appp.auth.auth is a blueprint
 auth_bp = create_flask_blueprint([Strava], oauth, handle_authorize)

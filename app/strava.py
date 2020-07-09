@@ -7,7 +7,7 @@ from app.models import db, Athlete, Activity
 strava_bp = Blueprint('strava', __name__)
 
 STRAVA_SUBSCRIBE_URL = 'https://www.strava.com/api/v3/push_subscriptions'
-STRAVE_UNSUBSCRIBE_URL = 'https://www.strava.com/api/v3/push_subscriptions/d'
+
 
 def get_activity(athelete, activity_id):
     # get an activity from strava
@@ -16,6 +16,7 @@ def get_activity(athelete, activity_id):
 
 @strava_bp.before_app_first_request
 def check_and_make_subscription():
+    
     params = {
         'client_id': current_app.config['STRAVA_CLIENT_ID'],
         'client_secret': current_app.config['STRAVA_CLIENT_SECRET'],

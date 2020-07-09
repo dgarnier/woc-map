@@ -9,88 +9,103 @@ crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
    crossorigin=""></script>
+<!-- Make sure you put this AFTER Leaflet's CSS
 <script src="https://unpkg.com/leaflet-gpx@1.5.0/gpx.js"></script>
+-->
+<script src="{{ url_for('static', filename='leaflet-providers.js') }}"></script>
+<script src="{{ url_for('static', filename='Polyline.encoded.js') }}"></script>
+
 {% endblock %}
 
 {% block styles %}
     {{super()}}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .leaflet-control-layers-list {
+            text-align: left;
+        }
+    </style>
 {% endblock %}
 
 {% block scripts %}
 {{super()}}
 <script src="{{ url_for('static', filename='Polyline.encoded.js') }}"></script>
 <script src="{{ url_for('static', filename='leaflet-hash.js') }}"></script>
-<script>
+<!-- 
+<script src="{{ url_for('static', filename='jquery.ajax-retry.min.js') }}"></script>
+ -->
+ <script>
     const encoded_pl="gqabGd`tpLsCb@KZBfBuArFU^uAr@mEvA}UtDkNtCSz@kE|@t@`NIr@yU^yDnB}B~CyAn@{@jBcGsHq@YmBC_A_BeDaDiCuJeDyPaB_R}F_UWiBa@mH{CoI}A_GiKdEqHtEsB_@}BaC}@YkIBgBkFWSoYrHgDhBwLzIkJ|JyG~F{MpIkIhKgCtAaCPkCSm[wIQa@t@_HIi@{Bu@cLqHaDg@mGv@q@_@wEkEmB}CwAuAmB]kCb@sI?qK_FCY^wAJwA_@mINgLbCwf@c@iD{BsEsAaEc@_CAkBOUc@@wEjBwNpJeKbEqMbAcJfDcGxCkIdCwI|AgErB]Gt@}MzAwOnAgFzHqWxBuMrAqCzBkDhQeRrBqDEk@YM{BLkBTeAjAw@Jy@w@oA_CkAOoDnAiLlI{@CeCqBw@CgA^gAjA{EtJaGzC_FxAeAr@_AlAuMhV_@dBQfFUl@{BCaK{AeN`Ak@rI?lCZlFz@pGBpDkCnPsFpc@y@fCwCfESNQOyFsL{CyEgAy@iCm@gDRqHrB_O`K_Dj@wEX[nHaEjRsBtFmGlWgBfM}E~Lo@lW[jCgEbEuKnHwBrB}AzEgCnFk@fBWxBObE}@fEqA|BkFrGy@rBKdCnAtNThK\\`Hs@xFqEpP}@pG[r@o@Y}VcVoQuLWg@s@uGs@wDb@ePOyF`A}AdA_FpFsEdDsBjCaDnAoEnA_Jv@wCr@y@lHU~AJbDrAbF|DvCnCfB^hAn@nABnAl@pA{AnAiCfAoExHsGjDkBpCiCzAuBz@c@xBVfHFv@XzArA~Bt@|EP`K]lTtBzA]dCiCnAk@fC?jLlBnF@fBWjJeEpC}CvEcKdHkQjAqBIm@qBeEgH}SkAgFAgE\\sE~@sCfB_DlCsCnVcU`DeDnAqBxBeCvH_GnByCjEgLp@s@lEcCvJsBvJwCdGaDrCeAxEy@`Kk@zAg@hBkAdD}@zOiKxA[`@e@rBs@VPVnCx@|ChDjHXdCyBvd@a@nN@bBj@dFQrB_@vAHR~CrBhG|B`IJ~Bg@hBb@lDbEdC`BfBtBz@h@zADxE{@tCh@nHtFxEtBk@tHLv@fZrI|Bb@bB?nBYlB_A~I{KzQqLbCuB`IiJjPcMfE}AhVoGh@^tAfExIFx@^~B~BlAVvAUzDqCdLiFh@@nAtFvBtF`@dBp@tJhGdVfAtNlD~QjCrKXh@pCjCz@rBjBKr@PhBhCjDtDXMb@gAhAi@lBqCpDsCvVUJW?eAu@oLD]bEs@Nq@j@UhG_AdGaBlUmDzFqB`BoFDgDnDw@";
     var polly = L.PolylineUtil.decode(encoded_pl);
 
-    // ==========
-    // Handle map
-    // ==========
-    // Available tiles definition
-    var cyclosm = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-        minZoom: 0,
-        maxZoom: 20,
-    });
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-        minZoom: 0,
-        maxZoom: 19,
-    });
-    var piano = L.tileLayer('https://{s}.piano.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png', {
-        attribution: 'Tiles <a href="https://github.com/tilery/pianoforte">PianoFr</a> | &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-        minZoom: 0,
-        maxZoom: 20,
-    });
-    var ocm = L.tileLayer('https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-        minZoom: 0,
-        maxZoom: 18,
-    });
-    var otm = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-        minZoom: 0,
-        maxZoom: 18,
-    });
-    var cyclosm_lite = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm-lite/{z}/{x}/{y}.png', {
-        attribution: 'CyclOSM Lite',
-        minZoom: 11,
-        maxZoom: 20,
-    });
-    var waymarked_trails = L.tileLayer('https://tile.waymarkedtrails.org/cycling/{z}/{x}/{y}.png', {
-        attribution: '<a href="https://cycling.waymarkedtrails.org/">https://cycling.waymarkedtrails.org/</a>',
-        minZoom: 0,
-        maxZoom: 18,
-    });
 
-    var map = L.map('mapid', { layers: [cyclosm] });
-    //cyclosm.addTo(map)
+    // add Stamen Watercolor to map.
+    var stamen_wc = L.tileLayer.provider('Stamen.Watercolor');
+    var cyclosm =  L.tileLayer.provider('CyclOSM');
+    var tf_ocm = L.tileLayer.provider("Thunderforest.OpenCycleMap",{apikey:'aa1d4d9511574ee5a1ebca9b7e8a5baf'});
+    var tf_lands = L.tileLayer.provider("Thunderforest.Landscape",{apikey:'aa1d4d9511574ee5a1ebca9b7e8a5baf'});
+    var carto_VLU = L.tileLayer.provider("CartoDB.VoyagerLabelsUnder");
+    var stadia_alidade = L.tileLayer.provider('Stadia.AlidadeSmooth');
+    var stadia_alidade_dark = L.tileLayer.provider('Stadia.AlidadeSmoothDark');
+    var osm_mapbox = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            id: 'mapbox/streets-v11',
+            tileSize: 512,
+            zoomOffset: -1
+        });
     
+    var map = L.map('mapid', { layers: [carto_VLU] });
+    //if (!map.restoreView()) {
+    map.setView([42.2, -71.88], 8);
+
     var popup_route = L.popup();
+    var routeLayer = L.geoJSON().addTo(map);
 
-    function onPolylineClick(e) {
-        popup_route
-            .setLatLng(e.latlng)
-            .setContent("You on a course")
-            .openOn(map);
-    }
+    const routes = [
+        '_B_lackLivesMatter',
+        'B_l_ackLivesMatter',
+        'Bl_a_ckLivesMatter',
+        'Bla_c_kLivesMatter',
+        'Blac_k_LivesMatter',
+        'Black_L_ivesMatter',
+        'BlackL_i_vesMatter',
+        'BlackLi_v_esMatter',
+        'BlackLiv_e_sMatter',
+        'BlackLive_s_Matter',
+        'BlackLives_M_atter',
+        'BlackLivesM_a_tter',
+        'BlackLivesMa_t_ter',
+        'BlackLivesMat_t_er',
+        'BlackLivesMatt_e_r',
+        'BlackLivesMatte_r_'
+    ];
 
-    function add_geojson( map, style, url) {
+    
+    function add_geojson(name, style) {
+        const urlbase = "{{ url_for('static', filename='routes') }}";
+        const url = `${urlbase}/${name}.geojson`
         // return a promise
         return $.ajax({
-            url : url,
-            timeout : 3000,
-            dataType : "json",
-            tryCount : 0,
-            retryLimit : 5,
-            success : function(json) {
-                var gJ = L.geoJson(json, style).addTo(map);
-                gJ.on('click', onPolylineClick);
+            url: url,
+            timeout: 3000,
+            dataType: "json",
+            tryCount: 0,
+            retryLimit: 5,
+            success: function (json) {
+                var gJ = L.geoJson(json, { style: style }).addTo(routeLayer);
+                gJ.on('click', (e) => {
+                    popup_route
+                        .setLatLng(e.latlng)
+                        .setContent(`Click to download route.<br><b><a href="${urlbase}/${name}.tcx">${name}.tcx</a></b>`)
+                        .openOn(map);
+                    L.DomEvent.stopPropagation(e);
+                });
 
             },
-            error : function(xhr, textStatus, errorThrown) {
+            error: function (xhr, textStatus, errorThrown) {
                 if (textStatus == 'timeout') {
                     this.tryCount++;
                     if (this.tryCount <= this.retryLimit) {
@@ -108,49 +123,39 @@ crossorigin=""/>
         });
     }
 
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/_B_lackLivesMatter.geojson') }}");
-    add_geojson(map, {color:'green'},   "{{ url_for('static', filename='routes/B_l_ackLivesMatter.geojson') }}");
-    add_geojson(map, {color:'red'},     "{{ url_for('static', filename='routes/Bl_a_ckLivesMatter.geojson') }}");
-    add_geojson(map, {color:'brown'},    "{{ url_for('static', filename='routes/Bla_c_kLivesMatter.geojson') }}");
-    add_geojson(map, {color:'magenta'}, "{{ url_for('static', filename='routes/Blac_k_LivesMatter.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/Black_L_ivesMatter.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackL_i_vesMatter.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackLi_v_esMatter.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackLiv_e_sMatter.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackLive_s_Matter.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackLives_M_atter.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackLivesM_a_tter.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackLivesMa_t_ter.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackLivesMat_t_er.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackLivesMatt_e_r.geojson') }}");
-    add_geojson(map, {color:'blue'},    "{{ url_for('static', filename='routes/BlackLivesMatte_r_.geojson') }}");
+    var i;
+    var len = routes.length;
+    for (i=0; i < len; i++) {
+        add_geojson(routes[i], `route-${i+1}` );
+    }
 
     //L.polyline(polly, {color:'blue'}).addTo(map);
     
     //L.poline(polly)
 
-    //if (!map.restoreView()) {
-    map.setView([42.2, -71.88], 8);
     //}
 
     //map.attributionControl.setPrefix('<a href="http://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> | <a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> ' + VERSION);
 
     // Set up layers control
     var baseMaps = {
-        "CyclOSM": cyclosm,
-        "OpenStreetMap.org": osm,
-        "OpenCycleMap": ocm,
-        "OpenTopoMap": otm,
-        "OSM Piano": piano,
+        'Stamen.Watercolor'          : stamen_wc,           
+        'CycOSM'                     : cyclosm   ,       
+        "Thunderforest.OpenCycleMap" : tf_ocm     ,      
+        "Thunderforest.Landscape"    : tf_lands    ,    
+        "CartoDB.VoyagerLabelsUnder" : carto_VLU    ,    
+        'Stadia.AlidadeSmooth'       : stadia_alidade,   
+        'Stadia.AlidadeSmoothDark'   : stadia_alidade_dark,
+        'MapBox OSM': osm_mapbox
     };
 
     var overlayMaps = {
-        "Waymarked Trails": waymarked_trails,
-        "CyclOSM Lite": cyclosm_lite
+        "BLM Routes": routeLayer
     };
 
     L.control.layers(baseMaps, overlayMaps, { collapsed: true }).addTo(map);
 
+    /*
     // Set up hash plugin
     var allMapLayers = {
         'cyclosm': cyclosm,
@@ -160,36 +165,10 @@ crossorigin=""/>
         'opentopomap': otm,
         'waymarkedtrails': waymarked_trails,
         'cyclosmlite': cyclosm_lite,
+        'blm_routes': routeLayer
     };
     // L.Hash(map, allMapLayers);
-
-
-    /*
-        L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/cyclosm/{z}/{x}/{y}.png', 
-            {
-                maxZoom: 20,
-                attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }
-        ).addTo(map);
     */
-
-    /*
-        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-            maxZoom: 18
-        }).addTo(map);
-    */
-
-    osm_mapbox = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-        maxZoom: 18,
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-            '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-            'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        id: 'mapbox/streets-v11',
-        tileSize: 512,
-        zoomOffset: -1
-    });
 
 
     /* 	L.marker([51.5, -0.09]).addTo(mymap)
@@ -219,17 +198,28 @@ crossorigin=""/>
 
     map.on('click', onMapClick);
 
+
 </script>
 {% endblock %}
 
 {% block content %}
-<style>
-    .leaflet-control-layers-list {
-        text-align: left;
-    }
-    
-</style>
+<!-- 
+<div id="info">
+    <h4><a href="https://github.com/leaflet-extras/leaflet-providers">Leaflet-providers preview</a></h4>
+    <p>
+        This page shows mini maps for all the layers available in <a
+            href="https://github.com/leaflet-extras/leaflet-providers">Leaflet-providers</a>.
+    </p>
+</div>
 
-<div id="mapid"></div> 
+<div class="github-fork-ribbon-wrapper left">
+    <div class="github-fork-ribbon">
+        <a href="https://github.com/leaflet-extras/leaflet-providers">Fork me on GitHub</a>
+    </div>
+</div>
+ -->
+<div id="nav_bar"></div>
+<div id="mapid"></div>
+<div id="footer"></div>
 
 {% endblock %}
