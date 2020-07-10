@@ -7,3 +7,4 @@ log/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 secrets.py
+*.sqlite3
