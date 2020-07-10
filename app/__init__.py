@@ -42,6 +42,7 @@ def map():
                             'firstname',
                             'lastname',
                             'profile',
+                            'profile_medium',
                             'city',
                             'state',
                             'country'
