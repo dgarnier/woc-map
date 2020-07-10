@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<html>
+<head>
+	<title>WOC Demo Strava Registration</title>
+	<meta name="generator" content="BBEdit 13.1" />
+	
+	<style>
+		html, body
+		{
+			height: 100%;
+			width: 100%;
+			margin: auto;
+		}
+		
+		.top
+		{
+			height: 20%;
+			font-size: 40pt;
+			display: flex;
+			align-items: center;
+			padding: 20px 20px;
+		}
+		
+		.holder
+		{
+			height: 70%;
+			width: 100%;
+			position: relative;
+		}
+		
+		iframe
+		{
+			height: 100%;
+			width: 100%;
+			margin: auto;
+		}
+		
+		.bottom
+		{
+			height: 10%;
+			display: flex;
+			align-items: center;
+		}
+		
+		.login
+		{
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			width: 25%;
+			background-color: white;
+			padding: 20px 10px;
+			text-align: center;
+			font-family: Montserrat, sans-serif;
+			font-size:12px;
+		}
+
+	
+.cbutton {color:black; background-color:white; text-decoration:none; font-size: 14px;font-weight: bold;font-family: Montserrat, sans-serif;padding: 10px 10px; margin: auto; margin-bottom:10px;width: 80%; border: 1px solid black; text-align: center;display: block;transition: all 500ms ease;}
+.cbutton-inner:before {content: url(button-arrow-black.svg); float: right; margin-left: 10px; }
+.cbutton-inner:hover:before {content: url(button-arrow-white.svg);}
+.cbutton:hover {color:white; background-color:#ff7201;}
+.wocstravalegal {font-size:10px;margin-top:10px;}
+.woclink {color: #ff7201;}
+.wocstrava {margin-top:10px;}
+</style>
+
+</head>
+<body>
+<div class="top">
+	<img src="wocdarren.png"  height="90" alt=""/> 
+</div>
+<div class="holder">
+	<div class="login">
+		<a class="cbutton" href="http://wheelsofchange.us/app/login/strava"><span class="cbutton-inner">Connect with Strava</span></a>
+		<div>Please connect to Strava so your rides will be credited</div>
+		<div class="wocstravalegal"><strong>Why do we need your authorization?</strong><br>In order to add your ride to the map, you need to authorize us to connect to your Strava public activities. We respect your privacy - we will only upload publicly available data. You can deauthorize our access at any time using the <a href="https://www.strava.com/settings/apps" title="Strava settings" class="woclink" target="_blank">Settings/My Apps</a> feature on the Strava website.</div>
+		<div class="wocstrava"><img alt="powered by Strava" src="api_logo_pwrdBy_strava_stack_light.png"  height="60"></div>
+	</div>
+	<iframe class="middle" src="http://wheelsofchange.us/app/map"> </iframe> 
+</div>
+<div class="bottom">
+	Powered by Strava 
+</div>
+</body>
+</html>
