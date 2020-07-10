@@ -1,0 +1,39 @@
+INFO:werkzeug: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 286-111-375
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): www.strava.com:443
+DEBUG:urllib3.connectionpool:https://www.strava.com:443 "GET /api/v3/push_subscriptions?client_id=11101&client_secret=d2d8f8b84dd8d35896a5d7150350b113494710d4 HTTP/1.1" 200 None
+INFO:app:Strava subscription check: <Response [200]>
+INFO:app:Strava data: []
+INFO:app:Subscribing to Strava notifications.
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): www.strava.com:443
+DEBUG:urllib3.connectionpool:https://www.strava.com:443 "POST /api/v3/push_subscriptions?client_id=11101&client_secret=d2d8f8b84dd8d35896a5d7150350b113494710d4&callback_url=http%3A%2F%2Flocalhost%3A5000%2Fcallback&verify_token=WOC_ASKED_FOR_THIS HTTP/1.1" 500 None
+INFO:app:Strava notification subscription; <Response [500]>
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:17:55] "[37mGET /map HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:17:59] "[37mGET /map HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /map HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/css/main.css HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/Polyline.encoded.js HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/leaflet-providers.js HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/leaflet-hash.js HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/_B_lackLivesMatter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/Bl_a_ckLivesMatter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/B_l_ackLivesMatter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/Bla_c_kLivesMatter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/Blac_k_LivesMatter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/Black_L_ivesMatter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/BlackL_i_vesMatter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/BlackLi_v_esMatter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/BlackLiv_e_sMatter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/BlackLives_M_atter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/BlackLive_s_Matter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/BlackLivesM_a_tter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/BlackLivesMa_t_ter.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/BlackLivesMat_t_er.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/BlackLivesMatt_e_r.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug:127.0.0.1 - - [09/Jul/2020 21:18:02] "[37mGET /static/routes/BlackLivesMatte_r_.geojson HTTP/1.1[0m" 200 -
+INFO:werkzeug: * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 286-111-375

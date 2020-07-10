@@ -32,7 +32,7 @@ class Athlete(db.Model, UserMixin):
     refresh_token = db.Column(db.String)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
-    subscription_id = db.Column(db.Integer)
+    last_activity_check = db.Column(db.DateTime, default=datetime.utcnow)
 
     @property
     def is_authenticated(self):
