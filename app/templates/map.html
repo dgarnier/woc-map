@@ -16,7 +16,6 @@ crossorigin=""/>
 {% block styles %}
     {{super()}}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/gh-fork-ribbon.css') }}" />
 
     <style>
         .leaflet-control-layers-list {
@@ -32,14 +31,9 @@ crossorigin=""/>
 {% block scripts %}
 {{super()}}
 <script src="{{ url_for('static', filename='js/Polyline.encoded.js') }}"></script>
-<script src="{{ url_for('static', filename='js/leaflet-hash.js') }}"></script>
-<!-- 
-<script src="{{ url_for('static', filename='js/jquery.ajax-retry.min.js') }}"></script>
- -->
- <script>
+<script>
     const encoded_pl="gqabGd`tpLsCb@KZBfBuArFU^uAr@mEvA}UtDkNtCSz@kE|@t@`NIr@yU^yDnB}B~CyAn@{@jBcGsHq@YmBC_A_BeDaDiCuJeDyPaB_R}F_UWiBa@mH{CoI}A_GiKdEqHtEsB_@}BaC}@YkIBgBkFWSoYrHgDhBwLzIkJ|JyG~F{MpIkIhKgCtAaCPkCSm[wIQa@t@_HIi@{Bu@cLqHaDg@mGv@q@_@wEkEmB}CwAuAmB]kCb@sI?qK_FCY^wAJwA_@mINgLbCwf@c@iD{BsEsAaEc@_CAkBOUc@@wEjBwNpJeKbEqMbAcJfDcGxCkIdCwI|AgErB]Gt@}MzAwOnAgFzHqWxBuMrAqCzBkDhQeRrBqDEk@YM{BLkBTeAjAw@Jy@w@oA_CkAOoDnAiLlI{@CeCqBw@CgA^gAjA{EtJaGzC_FxAeAr@_AlAuMhV_@dBQfFUl@{BCaK{AeN`Ak@rI?lCZlFz@pGBpDkCnPsFpc@y@fCwCfESNQOyFsL{CyEgAy@iCm@gDRqHrB_O`K_Dj@wEX[nHaEjRsBtFmGlWgBfM}E~Lo@lW[jCgEbEuKnHwBrB}AzEgCnFk@fBWxBObE}@fEqA|BkFrGy@rBKdCnAtNThK\\`Hs@xFqEpP}@pG[r@o@Y}VcVoQuLWg@s@uGs@wDb@ePOyF`A}AdA_FpFsEdDsBjCaDnAoEnA_Jv@wCr@y@lHU~AJbDrAbF|DvCnCfB^hAn@nABnAl@pA{AnAiCfAoExHsGjDkBpCiCzAuBz@c@xBVfHFv@XzArA~Bt@|EP`K]lTtBzA]dCiCnAk@fC?jLlBnF@fBWjJeEpC}CvEcKdHkQjAqBIm@qBeEgH}SkAgFAgE\\sE~@sCfB_DlCsCnVcU`DeDnAqBxBeCvH_GnByCjEgLp@s@lEcCvJsBvJwCdGaDrCeAxEy@`Kk@zAg@hBkAdD}@zOiKxA[`@e@rBs@VPVnCx@|ChDjHXdCyBvd@a@nN@bBj@dFQrB_@vAHR~CrBhG|B`IJ~Bg@hBb@lDbEdC`BfBtBz@h@zADxE{@tCh@nHtFxEtBk@tHLv@fZrI|Bb@bB?nBYlB_A~I{KzQqLbCuB`IiJjPcMfE}AhVoGh@^tAfExIFx@^~B~BlAVvAUzDqCdLiFh@@nAtFvBtF`@dBp@tJhGdVfAtNlD~QjCrKXh@pCjCz@rBjBKr@PhBhCjDtDXMb@gAhAi@lBqCpDsCvVUJW?eAu@oLD]bEs@Nq@j@UhG_AdGaBlUmDzFqB`BoFDgDnDw@";
     var polly = L.PolylineUtil.decode(encoded_pl);
-
 
     // add Stamen Watercolor to map.
     var stamen_wc = L.tileLayer.provider('Stamen.Watercolor');
@@ -152,57 +146,12 @@ crossorigin=""/>
 
     L.control.layers(baseMaps, overlayMaps, { collapsed: true }).addTo(map);
 
-
-    /*
-    // Set up hash plugin
-    var allMapLayers = {
-        'cyclosm': cyclosm,
-        'piano': piano,
-        'openstreetmap': osm,
-        'opencyclemap': ocm,
-        'opentopomap': otm,
-        'waymarkedtrails': waymarked_trails,
-        'cyclosmlite': cyclosm_lite,
-        'blm_routes': routeLayer
-    };
-    // L.Hash(map, allMapLayers);
-    */
-
-
-    /* 	L.marker([51.5, -0.09]).addTo(mymap)
-            .bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
-    
-        L.circle([51.508, -0.11], 500, {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.5
-        }).addTo(mymap).bindPopup("I am a circle.");
-    
-        L.polygon([
-            [51.509, -0.08],
-            [51.503, -0.06],
-            [51.51, -0.047]
-        ]).addTo(mymap).bindPopup("I am a polygon.");
-    
-     */
-    /*
-    var popup = L.popup();
-
-    function onMapClick(e) {
-        popup
-            .setLatLng(e.latlng)
-            .setContent("You clicked the map at " + e.latlng.toString())
-            .openOn(map);
-    }
-    map.on('click', onMapClick);
-    */
-
-    L.Control.Watermark = L.Control.extend({
+    L.Control.StravaMark = L.Control.extend({
             onAdd: function (map) {
                 var img = L.DomUtil.create('img');
 
-                img.src = "{{ url_for('static', filename = 'images/api_logo_pwrdBy_strava_stack_light.png') }}";
-                //img.style.width = '200px';
+                img.src = "{{ url_for('static', filename = 'images/api_logo_pwrdBy_strava_stack_light.svg') }}";
+                img.style.width = '150px';
 
                 return img;
             },
@@ -213,10 +162,12 @@ crossorigin=""/>
         });
 
         L.control.watermark = function (opts) {
-            return new L.Control.Watermark(opts);
+            return new L.Control.StravaMark(opts);
         }
 
-        L.control.watermark({ position: 'bottomleft' }).addTo(map);
+    
+
+    L.control.watermark({ position: 'bottomleft' }).addTo(map);
 
     L.Control.Watermark = L.Control.extend({
             onAdd: function (map) {

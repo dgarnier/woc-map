@@ -65,6 +65,17 @@ def club_activities():
     return jsonify(resp.json())
 
 
+@app.route('/club/<api>')
+@login_required
+def club_api(api):
+    club = app.config['STRAVA_CLUB_ID']
+    url = f"clubs/{club}/{api}"
+    app.logger.info(f'Getting club {api}: {url}')
+    resp = oauth.strava.request('GET', url, params=request.args)
+    app.logger.info(resp)
+    return jsonify(resp.json())
+
+
 @app.route('/activity/<activity_id>')
 def activity(activity_id):
     url = f"activities/{activity_id}"
