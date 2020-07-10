@@ -1,11 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'bootstrap/base.html' %}
 
 {% block styles %}
 <style>
-    .profile-avatar img {
-        border-radius: 50%;
-    }
-
     .centered {
         position: fixed;
         top: 50%;
@@ -13,16 +9,14 @@
         /* bring your own prefixes */
         transform: translate(-50%, -50%);
     }
-
-
 </style>
 {% endblock %}
+
 {% block content %}
 <div class="centered">
-    <div class="profile-avatar">
-        <img src="{{user_info.profile}}">
-    </div>
-    <br>
-    <div >Welcome {{ user_info.firstname }}!</div>
+    <a href="{{ url_for('loginpass.login',name='strava') }}">
+        <img src="{{ url_for('static', filename='images/btn_strava_connectwith_orange@2x.png') }}"
+            alt="Connect with STRAVA" />
+    </a>
 </div>
 {% endblock %}

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify, redirect
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_required, current_user
 
@@ -25,15 +25,31 @@ oauth.init_app(app)
 app.register_blueprint(auth_bp)
 app.register_blueprint(strava_bp)
 
+
 @app.route('/')
 def index():
     # return render_template("index.html")
-    return redirect('/map')
+    return redirect(url_for('map'))
 
 
 @app.route('/map')
 def map():
-    return render_template('map.html')
+    if current_user.is_anonymous:
+        user_info = dict(anonymous=True)
+    else:
+        user_info = { prop:getattr(current_user,prop) 
+                        for prop in [
+                            'firstname',
+                            'lastname',
+                            'profile',
+                            'city',
+                            'state',
+                            'country'
+                        ]
+                    }
+        user_info['anonymous']=False
+
+    return render_template('map.html', user_info=user_info)
 
 
 @app.route('/club_activities')
@@ -74,8 +90,7 @@ def map_activity(activity_id):
 
 @app.route('/strava_login')
 def strava_login():
-    tpl = '<ul><li><a href="/login/strava">Strava Login</a></li></ul>'
-    return tpl
+    return render_template('strava_login.html')
 
 
 @app.route('/user_info')
