@@ -1,10 +1,11 @@
 Options +ExecCGI
 AddHandler fcgid-script .fcgi
 
+# these aren't allowed on a shared machine
 #Alias /wocapp/static/ /home1/wheelsp5/public_html/wocapp/app/static/
 #ScriptAlias /wocapp/ /home1/wheelsp5/public_html/wocapp/app.fcgi/
 
 RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !=/home1/wheelsp5/public_html/wocapp/app.fcgi
+RewriteCond %{REQUEST_FILENAME} !=/home1/wheelsp5/public_html/app/app.fcgi
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ app.fcgi/$1 [QSA,L]

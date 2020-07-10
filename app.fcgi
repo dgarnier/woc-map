@@ -15,13 +15,13 @@ class ScriptNameStripper(object):
        self.app = app
 
    def __call__(self, environ, start_response):
-       environ['SCRIPT_NAME'] = '/app/app'
+       environ['SCRIPT_NAME'] = '/app'
        return self.app(environ, start_response)
 
 
-os.environ['APPLICATION_ROOT']='/app'
+app.config['APPLICATION_ROOT']='/app'
 application = ScriptNameStripper(app)
 logging.basicConfig(filename=join(log_dir,'flask_console.log'), level=logging.DEBUG)
 
-WSGIServer(application, maxThreads=12).run()
+WSGIServer(application, maxProcesses=4).run()
 
