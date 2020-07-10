@@ -28,11 +28,15 @@ def check_and_make_subscription():
             current_app.logger.info('Unexpected subscription: ' +
                                     f'{sub["callback_url"]} != {callback_url}'
                                     )
-            if current_app.config['FLASK_ENV'] != 'production':
+            if current_app.config.get('FLASK_ENV') == 'production':
+                # production server rules!
+                delete_subscription(sub["id"])
+            else:
                 current_app.logger.info("OK! I'm not production server.")
                 return
-            delete_subscription(sub["id"])
-    subscribe(callback_url)
+    if 'localhost' not in callback_url:
+        # don't be silly
+        subscribe(callback_url)
 
 
 def check_current_subscription():
@@ -124,3 +128,4 @@ def callback():
 # add at end for other modules to grab the models
 # can't add sooner or will be circular references
 # from current_app import models
+
