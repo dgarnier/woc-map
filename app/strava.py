@@ -49,7 +49,7 @@ def subscribe():
     params = {
         'client_id': current_app.config['STRAVA_CLIENT_ID'],
         'client_secret': current_app.config['STRAVA_CLIENT_SECRET'],
-        'callback_url': url_for('strava.callback'),
+        'callback_url': url_for('strava.callback', _external=True),
         'verify_token': current_app.config['STRAVA_VERIFY_TOKEN']
         }
 
