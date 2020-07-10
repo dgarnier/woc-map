@@ -29,7 +29,7 @@ app.register_blueprint(strava_bp)
 @app.route('/')
 def index():
     # return render_template("index.html")
-    return redirect(url_for('map'))
+    return redirect(url_for('/map'))
 
 
 @app.route('/map')
