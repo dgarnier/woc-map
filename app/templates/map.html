@@ -16,6 +16,8 @@ crossorigin=""/>
 {% block styles %}
     {{super()}}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gh-fork-ribbon.css') }}" />
+
     <style>
         .leaflet-control-layers-list {
             text-align: left;
@@ -24,6 +26,7 @@ crossorigin=""/>
             clip-path: circle(70px at center);
         }
     </style>
+
 {% endblock %}
 
 {% block scripts %}
@@ -149,6 +152,7 @@ crossorigin=""/>
 
     L.control.layers(baseMaps, overlayMaps, { collapsed: true }).addTo(map);
 
+
     /*
     // Set up hash plugin
     var allMapLayers = {
@@ -192,77 +196,55 @@ crossorigin=""/>
     }
     map.on('click', onMapClick);
     */
+
+    L.Control.Watermark = L.Control.extend({
+            onAdd: function (map) {
+                var img = L.DomUtil.create('img');
+
+                img.src = "{{ url_for('static', filename = 'images/api_logo_pwrdBy_strava_stack_light.png') }}";
+                //img.style.width = '200px';
+
+                return img;
+            },
+
+            onRemove: function (map) {
+                // Nothing to do here
+            }
+        });
+
+        L.control.watermark = function (opts) {
+            return new L.Control.Watermark(opts);
+        }
+
+        L.control.watermark({ position: 'bottomleft' }).addTo(map);
+
+    L.Control.Watermark = L.Control.extend({
+            onAdd: function (map) {
+                var img = L.DomUtil.create('img');
+
+                img.src = "{{ user_info.profile_medium }}";
+                img.style.borderRadius = '50%';
+                //img.style.width = '200px';
+
+                return img;
+            },
+
+            onRemove: function (map) {
+                // Nothing to do here
+            }
+        });
+
+        L.control.watermark = function (opts) {
+            return new L.Control.Watermark(opts);
+        }
+
+        L.control.watermark({ position: 'bottomright' }).addTo(map);
+
+    
+
 </script>
 {% endblock %}
 
 {% block content %}
-<!-- 
-<div id="info">
-    <h4><a href="https://github.com/leaflet-extras/leaflet-providers">Leaflet-providers preview</a></h4>
-    <p>
-        This page shows mini maps for all the layers available in <a
-            href="https://github.com/leaflet-extras/leaflet-providers">Leaflet-providers</a>.
-    </p>
-</div>
-
-<div class="github-fork-ribbon-wrapper left">
-    <div class="github-fork-ribbon">
-        <a href="https://github.com/leaflet-extras/leaflet-providers">Fork me on GitHub</a>
-    </div>
-</div>
- -->
-<style>
-    .wrapper {
-        position: relative;
-    }
-
-
-    .floater {
-        position: absolute;
-        padding: 2px 0;
-        display: inline-block;
-    } 
-
-    .floater-wrapper {
-        width: 150px;
-        height: 150px;
-        position: absolute;
-        overflow: hidden;
-        top: 0;
-    }
-
-
-    #user-info {
-        position: absolute;
-        top: 40;
-        right: 200;
-        padding: 10px 10px;
-        display: inline-block;
-        z-index: 9999;
-    }
-
-    #powered-by {
-        position: absolute;
-        bottom: 20;
-        right: 200;
-        padding: 10px 10px;
-        top:0;
-        display: inline;
-        overflow: hidden;
-    }
-
-</style>
-<div class="wrapper">
-    <div id="mapid"></div>
-    <div id="powered-by"> 
-        <img href="{{ url_for('static', filename='images/api_logo_pwrdBy_strava_stack_light.png') }}" > 
-    </div>
-    <div id="user-info">
-        <div class="avatar-circled">
-            <img href="{{ user_info.profile }}">
-        </div>
-    </div>
-</div>
-
-
+<div id="mapid"></div>
 {% endblock %}

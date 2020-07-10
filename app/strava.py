@@ -1,4 +1,3 @@
-
 from flask import Blueprint, jsonify, request, current_app, url_for
 
 from app.auth import oauth
@@ -16,18 +15,39 @@ def get_activity(athelete, activity_id):
 
 @strava_bp.before_app_first_request
 def check_and_make_subscription():
-    
+    callback_url = url_for('strava.callback', _external=True)
+    sub = check_current_subscription()
+    if sub:
+        if sub["callback_url"] == callback_url:
+            current_app.logger.info('Got good subscription: ' +
+                                    f'{sub["callback_url"]}, ' +
+                                    f'updated: {sub["updated_at"]}'
+                                    )
+            return
+        else:
+            current_app.logger.info('Unexpected subscription: ' +
+                                    f'{sub["callback_url"]} != {callback_url}'
+                                    )
+            if current_app.config['FLASK_ENV'] != 'production':
+                current_app.logger.info("OK! I'm not production server.")
+                return
+            delete_subscription(sub["id"])
+    subscribe(callback_url)
+
+
+def check_current_subscription():
     params = {
         'client_id': current_app.config['STRAVA_CLIENT_ID'],
         'client_secret': current_app.config['STRAVA_CLIENT_SECRET'],
     }
     resp = oauth.strava.request(
         'GET', STRAVA_SUBSCRIBE_URL, withhold_token=True, params=params)
-    current_app.logger.info(f'Strava subscription check: {resp}')
-    current_app.logger.info(f'Strava data: {resp.json()}')
     data = resp.json()
     if data:
-        delete_subscription(data[0])
+        # only one allowed
+        return data[0]
+    else:
+        return None
 
 
 def delete_subscription(sub_id):
@@ -38,22 +58,21 @@ def delete_subscription(sub_id):
     resp = oauth.strava.request(
         'DELETE', STRAVA_SUBSCRIBE_URL+f'/{sub_id}', 
         withhold_token=True, params=params)
-    current_app.logger.info(f'Strava subscription check: {resp}')
-    current_app.logger.info(f'Strava data: {resp}')
+    current_app.logger.info(f'Subscription delete: {resp}')
 
 
-@strava_bp.before_app_first_request
-def subscribe():
+def subscribe(callback_url):
     current_app.logger.info('Subscribing to Strava notifications.')
     subscribe_url = 'https://www.strava.com/api/v3/push_subscriptions'
     params = {
         'client_id': current_app.config['STRAVA_CLIENT_ID'],
         'client_secret': current_app.config['STRAVA_CLIENT_SECRET'],
-        'callback_url': url_for('strava.callback', _external=True),
+        'callback_url': callback_url,
         'verify_token': current_app.config['STRAVA_VERIFY_TOKEN']
         }
 
-    resp = oauth.strava.request('POST', subscribe_url, withhold_token=True, params=params)
+    resp = oauth.strava.request('POST', subscribe_url,
+                                withhold_token=True, params=params)
     current_app.logger.info(f'Strava notification subscription; {resp}')
 
 
