@@ -23,5 +23,6 @@ app.config['APPLICATION_ROOT']='/app'
 application = ScriptNameStripper(app)
 logging.basicConfig(filename=join(log_dir,'flask_console.log'), level=logging.DEBUG)
 
-WSGIServer(application, maxProcesses=4).run()
+#WSGIServer(application, maxThreads=8).run()
+WSGIServer(application).run()
 
