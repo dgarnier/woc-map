@@ -28,11 +28,15 @@ def check_and_make_subscription():
             current_app.logger.info('Unexpected subscription: ' +
                                     f'{sub["callback_url"]} != {callback_url}'
                                     )
-            if current_app.config['FLASK_ENV'] != 'production':
+            if current_app.config.get('FLASK_ENV') == 'production':
+                # production server rules!
+                delete_subscription(sub["id"])
+            else:
                 current_app.logger.info("OK! I'm not production server.")
                 return
-            delete_subscription(sub["id"])
-    subscribe(callback_url)
+    if 'localhost' not in callback_url:
+        # don't be silly
+        subscribe(callback_url)
 
 
 def check_current_subscription():
@@ -56,7 +60,7 @@ def delete_subscription(sub_id):
         'client_secret': current_app.config['STRAVA_CLIENT_SECRET'],
     }
     resp = oauth.strava.request(
-        'DELETE', STRAVA_SUBSCRIBE_URL+f'/{sub_id}', 
+        'DELETE', STRAVA_SUBSCRIBE_URL+f'/{sub_id}',
         withhold_token=True, params=params)
     current_app.logger.info(f'Subscription delete: {resp}')
 
