@@ -29,7 +29,7 @@ app.register_blueprint(strava_bp)
 @app.route('/')
 def index():
     # return render_template("index.html")
-    return redirect(url_for('/map'))
+    return redirect(url_for('map'))
 
 
 @app.route('/map')
@@ -37,8 +37,8 @@ def map():
     if current_user.is_anonymous:
         user_info = dict(anonymous=True)
     else:
-        user_info = { prop:getattr(current_user,prop) 
-                        for prop in [
+        user_info = {prop: getattr(current_user, prop)
+                     for prop in [
                             'firstname',
                             'lastname',
                             'profile',
@@ -47,10 +47,15 @@ def map():
                             'state',
                             'country'
                         ]
-                    }
-        user_info['anonymous']=False
+                     }
+        user_info['anonymous'] = False
 
     return render_template('map.html', user_info=user_info)
+
+
+@app.route('/activate')
+def activate():
+    return render_template('activate.html')
 
 
 @app.route('/club_activities')
