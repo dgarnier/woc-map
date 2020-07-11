@@ -1,3 +1,5 @@
+import sqlalchemy.types as types
+import jsonpickle
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
@@ -15,6 +17,21 @@ class SQLA(SQLAlchemy):
 db = SQLA()
 
 
+'''
+class Json(types.MutableType, types.TypeDecorator):
+    impl = types.Unicode
+
+    def process_bind_param(self, value, engine):
+        return unicode(jsonpickle.encode(value))
+
+    def process_result_value(self, value, engine):
+        if value:
+            return jsonpickle.decode(value)
+        else:
+            # default can also be a list
+            return {}
+'''
+
 class Athlete(db.Model, UserMixin):
     "Strava Athelete and user"
     id = db.Column(db.Integer, primary_key=True)
@@ -31,8 +48,11 @@ class Athlete(db.Model, UserMixin):
     access_token_expires_at = db.Column(db.Integer)
     refresh_token = db.Column(db.String)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
+    last_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
     last_activity_check = db.Column(db.DateTime, default=datetime.utcnow)
+    club_member = db.Column(db.Boolean)
+    club_admin = db.Column(db.Boolean)
+
 
     @property
     def is_authenticated(self):
@@ -111,6 +131,7 @@ class Activity(db.Model):
     manual = db.Column(db.Boolean)
     private = db.Column(db.Boolean)
     flagged = db.Column(db.Boolean)
+    
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
 
 
