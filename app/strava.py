@@ -1,11 +1,28 @@
 from flask import Blueprint, jsonify, request, current_app, url_for
+from flask_login import login_required, current_user
 
 from app.auth import oauth
 from app.models import db, Athlete, Activity
 
-strava_bp = Blueprint('strava', __name__)
+strava = Blueprint('strava', __name__)
 
 STRAVA_SUBSCRIBE_URL = 'https://www.strava.com/api/v3/push_subscriptions'
+
+
+def get_strava_club_info(api=None, params=None):
+    club = current_app.config['STRAVA_CLUB_ID']
+    url = f"clubs/{club}/{api}" if api else f"clubs/{club}"
+    current_app.logger.info(f'Getting club {api}: {url}')
+    resp = oauth.strava.request('GET', url, params=params)
+    current_app.logger.info(resp)
+    return resp.json()
+
+
+@strava.route('/club/<api>')
+@login_required
+def club_api(api=None):
+    info = get_strava_club_info(api, request.args)
+    return jsonify(info)
 
 
 def get_activity(athelete, activity_id):
@@ -13,7 +30,7 @@ def get_activity(athelete, activity_id):
     pass
 
 
-@strava_bp.before_app_first_request
+@strava.before_app_first_request
 def check_and_make_subscription():
     callback_url = url_for('strava.callback', _external=True)
     sub = check_current_subscription()
@@ -101,7 +118,7 @@ def handle_strava_webhook_event(data):
 
 
 # handle strava webhooks subscriptions
-@strava_bp.route('/callback', methods=['GET', 'POST'])
+@strava.route('/callback', methods=['GET', 'POST'])
 def callback():
     # with a GET, strava is just validating
     if request.method == 'GET':

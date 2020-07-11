@@ -5,7 +5,7 @@ from flask_login import LoginManager, login_required, current_user
 
 from app.models import db
 from app.auth import auth_bp, oauth
-from app.strava import strava_bp
+from app.strava import strava
 
 from config import app_config
 
@@ -23,7 +23,7 @@ db.init_app(app)
 
 oauth.init_app(app)
 app.register_blueprint(auth_bp)
-app.register_blueprint(strava_bp)
+app.register_blueprint(strava)
 
 
 @app.route('/')
@@ -56,29 +56,6 @@ def map():
 @app.route('/activate')
 def activate():
     return render_template('activate.html')
-
-
-@app.route('/club_activities')
-@login_required
-def club_activities():
-    club = app.config['STRAVA_CLUB_ID']
-    url = f"clubs/{club}/activities"
-    app.logger.info(f'Getting club activites: {url}')
-    params = {'per_page': 30, 'page': 1}
-    resp = oauth.strava.request('GET', url, params=params)
-    app.logger.info(resp)
-    return jsonify(resp.json())
-
-
-@app.route('/club/<api>')
-@login_required
-def club_api(api):
-    club = app.config['STRAVA_CLUB_ID']
-    url = f"clubs/{club}/{api}"
-    app.logger.info(f'Getting club {api}: {url}')
-    resp = oauth.strava.request('GET', url, params=request.args)
-    app.logger.info(resp)
-    return jsonify(resp.json())
 
 
 @app.route('/activity/<activity_id>')
