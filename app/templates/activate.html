@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-<html>
 <head>
 	<title>WOC Demo Strava Registration</title>
 	<meta name="generator" content="BBEdit 13.1" />
@@ -8,18 +7,15 @@
 </head>
 <body>
 <div class="top">
-	<img src="{{url_for('static', filename='img/woc-activate-header.png')}}"  height="90" alt=""/> 
+	<img src="{{url_for('static', filename='img/woc-activate-header.png')}}"  height="90" alt="" /> 
 </div>
 <div class="holder">
 	<div class="login">
 		<a class="cbutton" href="{{ url_for('loginpass.login',name='strava') }}">
-			<span class="cbutton-inner">
 				<img src="{{ url_for('static', filename='img/btn_strava_connectwith_orange.svg') }}" alt="Connect with STRAVA" height="60">
-			</span>
 		</a>
 		<div>Please connect to Strava so your rides will be credited</div>
 		<div class="wocstravalegal"><strong>Why do we need your authorization?</strong><br>In order to add your ride to the map, you need to authorize us to connect to your Strava public activities. We respect your privacy - we will only upload publicly available data. You can deauthorize our access at any time using the <a href="https://www.strava.com/settings/apps" title="Strava settings" class="woclink" target="_blank">Settings/My Apps</a> feature on the Strava website.</div>
-		<div class="wocstrava"><img alt="powered by Strava" src="{{ url_for('static', filename = 'img/api_logo_pwrdBy_strava_horiz_light.svg') }}"  height="60"></div>
 	</div>
 	<iframe class="middle" src="{{ url_for('map') }}"> </iframe> 
 </div>

@@ -46,13 +46,12 @@
 			text-align: center;
 			font-family: Montserrat, sans-serif;
 			font-size:12px;
+			min-width:220px;
 		}
 
 	
-.cbutton {color:black; background-color:white; text-decoration:none; font-size: 14px;font-weight: bold;font-family: Montserrat, sans-serif;padding: 10px 10px; margin: auto; margin-bottom:10px;width: 80%; border: 1px solid black; text-align: center;display: block;transition: all 500ms ease;}
-.cbutton-inner:before {content: url(../img/button-arrow-black.svg); float: right; margin-left: 10px; }
-.cbutton-inner:hover:before {content: url(../img/button-arrow-white.svg);}
-.cbutton:hover {color:white; background-color:#ff7201;}
-.wocstravalegal {font-size:10px;margin-top:10px;}
+.cbutton { margin: auto; margin-bottom:10px;width: 80%;  text-align: center;}
+
+.wocstravalegal {font-size:12px;margin-top:10px;}
 .woclink {color: #ff7201;}
 .wocstrava {margin-top:10px;}
