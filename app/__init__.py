@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, jsonify, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_required, current_user
 
@@ -11,7 +11,8 @@ from config import app_config
 
 
 app = Flask(__name__)
-app.config.from_object(app_config[os.getenv('FLASK_CONFIG') or 'default'])
+app.config.from_object(app_config[os.getenv('FLASK_CONFIG') or
+                                  os.getenv('FLASK_ENV') or 'default'])
 
 bs = Bootstrap()
 bs.init_app(app)
@@ -23,7 +24,7 @@ db.init_app(app)
 
 oauth.init_app(app)
 app.register_blueprint(auth_bp)
-app.register_blueprint(strava)
+app.register_blueprint(strava, url_prefix='/strava')
 
 
 @app.route('/')

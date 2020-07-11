@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app, url_for
+from flask import Blueprint, jsonify, request, current_app, url_for, send_file
 from flask_login import login_required, current_user
 
 from app.auth import oauth
@@ -18,11 +18,40 @@ def get_strava_club_info(api=None, params=None):
     return resp.json()
 
 
+def cvsfileify(dict_list, filename):
+    import io
+    import csv
+
+    output = io.StringIO()
+    keys = list(dict_list[0])
+    keys.remove('resource_state')
+    writer = csv.DictWriter(output, keys, 
+                            extrasaction='ignore', dialect=csv.excel)
+    writer.writeheader()
+    writer.writerows(dict_list)
+    csv_string = output.getvalue()
+    mem = io.BytesIO(csv_string.encode('utf-8'))
+    return send_file(
+        mem,
+        as_attachment=True,
+        attachment_filename=filename,
+        mimetype='text/csv'
+    )
+
+
+# expose club api for authorized users
+@strava.route('/club')
 @strava.route('/club/<api>')
 @login_required
 def club_api(api=None):
-    info = get_strava_club_info(api, request.args)
-    return jsonify(info)
+    current_app.logger.info(f'requested club api {api}')
+    if api.lower().endswith('.csv'):
+        xapi = api.rsplit('.',1)[0]
+        info = get_strava_club_info(xapi, request.args)
+        return cvsfileify(info, api)
+    else:
+        info = get_strava_club_info(api, request.args)
+        return jsonify(info)
 
 
 def get_activity(athelete, activity_id):
