@@ -60,7 +60,7 @@ def delete_subscription(sub_id):
         'client_secret': current_app.config['STRAVA_CLIENT_SECRET'],
     }
     resp = oauth.strava.request(
-        'DELETE', STRAVA_SUBSCRIBE_URL+f'/{sub_id}', 
+        'DELETE', STRAVA_SUBSCRIBE_URL+f'/{sub_id}',
         withhold_token=True, params=params)
     current_app.logger.info(f'Subscription delete: {resp}')
 
@@ -128,4 +128,3 @@ def callback():
 # add at end for other modules to grab the models
 # can't add sooner or will be circular references
 # from current_app import models
-
