@@ -10,14 +10,12 @@ crossorigin=""/>
    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
    crossorigin=""></script>
 <script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
-<script src="{{ url_for('static', filename='js/leaflet.restoreview.js') }}"></script>
 
 {% endblock %}
 
 {% block styles %}
     {{super()}}
-    
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 
     <style>
         .leaflet-control-layers-list {
@@ -25,11 +23,6 @@ crossorigin=""/>
         }
         .avatar-circled {
             clip-path: circle(70px at center);
-        }
-        #mapid {
-        height: 800px;
-        width: 100%;
-        /* display: inline-block; */
         }
     </style>
 
@@ -39,7 +32,9 @@ crossorigin=""/>
 {{super()}}
 <script src="{{ url_for('static', filename='js/Polyline.encoded.js') }}"></script>
 <script>
-    
+    const encoded_pl="gqabGd`tpLsCb@KZBfBuArFU^uAr@mEvA}UtDkNtCSz@kE|@t@`NIr@yU^yDnB}B~CyAn@{@jBcGsHq@YmBC_A_BeDaDiCuJeDyPaB_R}F_UWiBa@mH{CoI}A_GiKdEqHtEsB_@}BaC}@YkIBgBkFWSoYrHgDhBwLzIkJ|JyG~F{MpIkIhKgCtAaCPkCSm[wIQa@t@_HIi@{Bu@cLqHaDg@mGv@q@_@wEkEmB}CwAuAmB]kCb@sI?qK_FCY^wAJwA_@mINgLbCwf@c@iD{BsEsAaEc@_CAkBOUc@@wEjBwNpJeKbEqMbAcJfDcGxCkIdCwI|AgErB]Gt@}MzAwOnAgFzHqWxBuMrAqCzBkDhQeRrBqDEk@YM{BLkBTeAjAw@Jy@w@oA_CkAOoDnAiLlI{@CeCqBw@CgA^gAjA{EtJaGzC_FxAeAr@_AlAuMhV_@dBQfFUl@{BCaK{AeN`Ak@rI?lCZlFz@pGBpDkCnPsFpc@y@fCwCfESNQOyFsL{CyEgAy@iCm@gDRqHrB_O`K_Dj@wEX[nHaEjRsBtFmGlWgBfM}E~Lo@lW[jCgEbEuKnHwBrB}AzEgCnFk@fBWxBObE}@fEqA|BkFrGy@rBKdCnAtNThK\\`Hs@xFqEpP}@pG[r@o@Y}VcVoQuLWg@s@uGs@wDb@ePOyF`A}AdA_FpFsEdDsBjCaDnAoEnA_Jv@wCr@y@lHU~AJbDrAbF|DvCnCfB^hAn@nABnAl@pA{AnAiCfAoExHsGjDkBpCiCzAuBz@c@xBVfHFv@XzArA~Bt@|EP`K]lTtBzA]dCiCnAk@fC?jLlBnF@fBWjJeEpC}CvEcKdHkQjAqBIm@qBeEgH}SkAgFAgE\\sE~@sCfB_DlCsCnVcU`DeDnAqBxBeCvH_GnByCjEgLp@s@lEcCvJsBvJwCdGaDrCeAxEy@`Kk@zAg@hBkAdD}@zOiKxA[`@e@rBs@VPVnCx@|ChDjHXdCyBvd@a@nN@bBj@dFQrB_@vAHR~CrBhG|B`IJ~Bg@hBb@lDbEdC`BfBtBz@h@zADxE{@tCh@nHtFxEtBk@tHLv@fZrI|Bb@bB?nBYlB_A~I{KzQqLbCuB`IiJjPcMfE}AhVoGh@^tAfExIFx@^~B~BlAVvAUzDqCdLiFh@@nAtFvBtF`@dBp@tJhGdVfAtNlD~QjCrKXh@pCjCz@rBjBKr@PhBhCjDtDXMb@gAhAi@lBqCpDsCvVUJW?eAu@oLD]bEs@Nq@j@UhG_AdGaBlUmDzFqB`BoFDgDnDw@";
+    var polly = L.PolylineUtil.decode(encoded_pl);
+
     // add Stamen Watercolor to map.
     var stamen_wc = L.tileLayer.provider('Stamen.Watercolor');
     var cyclosm =  L.tileLayer.provider('CyclOSM');
@@ -59,9 +54,8 @@ crossorigin=""/>
         });
     
     var map = L.map('mapid', { layers: [carto_VLU] });
-    if (!map.restoreView()) { // maybe the user was looking somewhere
-        map.setView([42.2, -71.88], 8);
-    }
+    //if (!map.restoreView()) {
+    map.setView([42.2, -71.88], 8);
 
     var popup_route = L.popup();
     var routeLayer = L.geoJSON().addTo(map);
@@ -83,10 +77,6 @@ crossorigin=""/>
         'BlackLivesMat_t_er',
         'BlackLivesMatt_e_r',
         'BlackLivesMatte_r_'
-    ];
-
-    const colors = [
-        'green', 'red', 'brown', '#0000CC', 'magenta'       
     ];
 
     
@@ -132,7 +122,7 @@ crossorigin=""/>
     var i;
     var len = routes.length;
     for (i=0; i < len; i++) {
-        add_geojson(routes[i], {color:colors[i % 5]} );
+        add_geojson(routes[i], `route-${i+1}` );
     }
 
     //L.polyline(polly, {color:'blue'}).addTo(map);
@@ -151,72 +141,59 @@ crossorigin=""/>
     };
 
     var overlayMaps = {
-        "WOC BLM Routes": routeLayer
+        "BLM Routes": routeLayer
     };
 
-    layer_control = L.control.layers(baseMaps, overlayMaps, { collapsed: true });
+    L.control.layers(baseMaps, overlayMaps, { collapsed: true }).addTo(map);
 
     L.Control.StravaMark = L.Control.extend({
-        onAdd: function (map) {
-            var img = L.DomUtil.create('img');
-            img.src = "{{ url_for('static', filename = 'img/api_logo_pwrdBy_strava_stack_light.svg') }}";
-            img.style.width = '150px';
-            return img;
-        },
+            onAdd: function (map) {
+                var img = L.DomUtil.create('img');
 
-        onRemove: function (map) {
-            // Nothing to do here
+                img.src = "{{ url_for('static', filename = 'images/api_logo_pwrdBy_strava_stack_light.svg') }}";
+                img.style.width = '150px';
+
+                return img;
+            },
+
+            onRemove: function (map) {
+                // Nothing to do here
+            }
+        });
+
+        L.control.watermark = function (opts) {
+            return new L.Control.StravaMark(opts);
         }
-    });
 
-    L.control.stravamark = function (opts) {
-        return new L.Control.StravaMark(opts);
-    }
+    
 
-    stravamark = L.control.stravamark({ position: 'bottomleft' });
+    L.control.watermark({ position: 'bottomleft' }).addTo(map);
 
-    L.Control.Avatar = L.Control.extend({
-        onAdd: function (map) {
-            var img = L.DomUtil.create('img');
-            img.src = "{{ user_info.profile_medium }}";
-            img.style.borderRadius = '50%';
-            return img;
-        },
+    L.Control.Watermark = L.Control.extend({
+            onAdd: function (map) {
+                var img = L.DomUtil.create('img');
 
-        onRemove: function (map) {
-            // Nothing to do here
+                img.src = "{{ user_info.profile_medium }}";
+                img.style.borderRadius = '50%';
+                //img.style.width = '200px';
+
+                return img;
+            },
+
+            onRemove: function (map) {
+                // Nothing to do here
+            }
+        });
+
+        L.control.watermark = function (opts) {
+            return new L.Control.Watermark(opts);
         }
-    });
 
-    L.control.avatar = function (opts) {
-        return new L.Control.Avatar(opts);
-    }
+        L.control.watermark({ position: 'bottomright' }).addTo(map);
 
-    avatar = L.control.avatar({ position: 'bottomright' });
-
-    function inIframe () {
-        try {
-            return window.self !== window.top;
-        } catch (e) {
-            return true;
-        }
-    }
-
-
-//    if (window.location == window.parent.location) {
-    if (inIframe() == false) {
-        // not in an iframe
-        layer_control.addTo(map);
-        stravamark.addTo(map);
-        avatar.addTo(map);
-        //console.log('not in iFrame');
-    } else {
-        //consol.log('in iframe');
-    }
     
 
 </script>
-
 {% endblock %}
 
 {% block content %}
