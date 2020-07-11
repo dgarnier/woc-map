@@ -17,6 +17,7 @@ class SQLA(SQLAlchemy):
 db = SQLA()
 
 
+'''
 class Json(types.MutableType, types.TypeDecorator):
     impl = types.Unicode
 
@@ -29,7 +30,7 @@ class Json(types.MutableType, types.TypeDecorator):
         else:
             # default can also be a list
             return {}
-
+'''
 
 class Athlete(db.Model, UserMixin):
     "Strava Athelete and user"
@@ -49,6 +50,9 @@ class Athlete(db.Model, UserMixin):
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
     last_activity_check = db.Column(db.DateTime, default=datetime.utcnow)
+    club_member = db.Column(db.Boolean)
+    club_admin = db.Column(db.Boolean)
+
 
     @property
     def is_authenticated(self):
