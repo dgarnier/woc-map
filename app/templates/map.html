@@ -1,22 +1,12 @@
 {% extends 'base.html' %}
-
-{% block head %}
-{{super()}}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-crossorigin=""/>
- <!-- Make sure you put this AFTER Leaflet's CSS -->
-<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-   crossorigin=""></script>
-<script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
-<script src="{{ url_for('static', filename='js/leaflet.restoreview.js') }}"></script>
-
-{% endblock %}
+{% block title %}Wheels of Change - Geo Art Map{% endblock %}
 
 {% block styles %}
     {{super()}}
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"> -->
 
     <style>
@@ -32,11 +22,15 @@ crossorigin=""/>
         /* display: inline-block; */
         }
     </style>
-
 {% endblock %}
 
 {% block scripts %}
 {{super()}}
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
+<script src="{{ url_for('static', filename='js/leaflet.restoreview.js') }}"></script>
 <script src="{{ url_for('static', filename='js/Polyline.encoded.js') }}"></script>
 <script>
     
@@ -195,6 +189,7 @@ crossorigin=""/>
     avatar = L.control.avatar({ position: 'bottomright' });
 
     function inIframe () {
+        // safe in different broswers 
         try {
             return window.self !== window.top;
         } catch (e) {
@@ -202,8 +197,6 @@ crossorigin=""/>
         }
     }
 
-
-//    if (window.location == window.parent.location) {
     if (inIframe() == false) {
         // not in an iframe
         layer_control.addTo(map);
@@ -214,9 +207,7 @@ crossorigin=""/>
         //consol.log('in iframe');
     }
     
-
 </script>
-
 {% endblock %}
 
 {% block content %}
