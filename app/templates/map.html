@@ -10,6 +10,10 @@
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"> -->
 
     <style>
+        html, body {
+            height: 100%;
+        }
+
         .leaflet-control-layers-list {
             text-align: left;
         }
@@ -17,7 +21,7 @@
             clip-path: circle(70px at center);
         }
         #mapid {
-        height: 800px;
+        height: 100%;
         width: 100%;
         /* display: inline-block; */
         }
@@ -172,7 +176,7 @@
     L.Control.Avatar = L.Control.extend({
         onAdd: function (map) {
             var img = L.DomUtil.create('img');
-            img.src = "{{ user_info.profile_medium }}";
+            img.src = "{{ user_info.profile_medium|safe }}";
             img.style.borderRadius = '50%';
             return img;
         },

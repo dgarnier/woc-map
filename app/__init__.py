@@ -36,22 +36,26 @@ def index():
 @app.route('/map')
 def map():
     if current_user.is_anonymous:
-        user_info = dict(anonymous=True)
+        info = dict(anonymous=True)
     else:
-        user_info = {prop: getattr(current_user, prop)
-                     for prop in [
-                            'firstname',
-                            'lastname',
-                            'profile',
-                            'profile_medium',
-                            'city',
-                            'state',
-                            'country'
-                        ]
-                     }
-        user_info['anonymous'] = False
+        info = {prop: getattr(current_user, prop)
+                for prop in [
+                        'firstname',
+                        'lastname',
+                        'profile',
+                        'profile_medium',
+                        'city',
+                        'state',
+                        'country'
+                    ]
+                }
+        if not info['profile_medium']:
+            info['profile_medium'] = \
+                'https://ui-avatars.com/api/?bold=true&size=70' + \
+                f"&name={info['firstname']}+{info['lastname']}"
+        info['anonymous'] = False
 
-    return render_template('map.html', user_info=user_info)
+    return render_template('map.html', user_info=info)
 
 
 @app.route('/activate')
