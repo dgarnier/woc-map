@@ -104,6 +104,9 @@ class Point(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+class ActivityTag(db.Model):
+    tag = db.Column(db.String(32), primary_key=True)
+    db.relationship('Activity', backref=db.backref('hashtags', lazy=True))
 
 class Activity(db.Model):
     activity_id = db.Column(db.Integer, primary_key=True)
@@ -112,6 +115,7 @@ class Activity(db.Model):
                               backref=db.backref('activities', lazy=True))
     name = db.Column(db.String)
     description = db.Column(db.String)
+    tags = db.Column(db.String)
     activity_type = db.Column(db.String)
     start_date = db.Column(db.DateTime)
     map_polyline = db.Column(db.Text)
