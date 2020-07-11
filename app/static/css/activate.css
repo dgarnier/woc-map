@@ -7,10 +7,6 @@
 		
 		.top
 		{
-			height: 20%;
-			font-size: 40pt;
-			display: flex;
-			align-items: center;
 			padding: 20px 20px;
 		}
 		
@@ -40,7 +36,7 @@
 			position: absolute;
 			top: 20px;
 			right: 20px;
-			width: 25%;
+			width: 15%;
 			background-color: white;
 			padding: 20px 10px;
 			text-align: center;
