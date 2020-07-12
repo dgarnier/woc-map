@@ -61,7 +61,7 @@ def get_club_info(api=None, params=None, token=None):
 @login_required
 def club_api(api=None):
     current_app.logger.info(f'requested club api {api}')
-    if api.lower().endswith('.csv'):
+    if api and api.lower().endswith('.csv'):
         xapi = api.rsplit('.', 1)[0]
         info = get_club_info(xapi, request.args)
         return cvsfileify(info, api)
