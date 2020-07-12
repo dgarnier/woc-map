@@ -73,8 +73,8 @@
         var map = L.map('mapid', { layers: [cyclosm] });
         //cyclosm.addTo(map)
 
-        var pl_encoded = "{{ polyline }}";
-        L.Polyline.fromEncoded(pl_encoded,).add_to(map).bindPopup({{ popup }});
+        //var pl_encoded = "{{ polyline }}";
+        //L.Polyline.fromEncoded(pl_encoded,).add_to(map).bindPopup({{ popup }});
 
         //if (!map.restoreView()) {
         map.setView([42.2, -71.88], 8);

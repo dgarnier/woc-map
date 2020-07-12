@@ -4,7 +4,7 @@ from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_required, current_user
 
 from app.models import db
-from app.auth import auth_bp, oauth
+from app.auth import oauth, auth
 from app.strava import strava
 
 from config import app_config
@@ -23,7 +23,8 @@ login_manager.init_app(app)
 db.init_app(app)
 
 oauth.init_app(app)
-app.register_blueprint(auth_bp)
+app.register_blueprint(auth)
+
 app.register_blueprint(strava, url_prefix='/strava')
 
 

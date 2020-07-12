@@ -1,8 +1,8 @@
-import sqlalchemy.types as types
-import jsonpickle
+from functools import wraps
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
+from flask import current_app
 
 
 class SQLA(SQLAlchemy):
@@ -17,24 +17,20 @@ class SQLA(SQLAlchemy):
 db = SQLA()
 
 
-'''
-class Json(types.MutableType, types.TypeDecorator):
-    impl = types.Unicode
+def admin_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if current_app.config.get('LOGIN_DISABLED'):
+            return func(*args, **kwargs)
+        elif not current_user.is_admin:
+            return current_app.login_manager.unauthorized()
+        return func(*args, **kwargs)
+    return decorated_view
 
-    def process_bind_param(self, value, engine):
-        return unicode(jsonpickle.encode(value))
-
-    def process_result_value(self, value, engine):
-        if value:
-            return jsonpickle.decode(value)
-        else:
-            # default can also be a list
-            return {}
-'''
 
 class Athlete(db.Model, UserMixin):
     "Strava Athelete and user"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     username = db.Column(db.String)
     firstname = db.Column(db.String)
     lastname = db.Column(db.String)
@@ -44,20 +40,26 @@ class Athlete(db.Model, UserMixin):
     profile = db.Column(db.String)
     profile_medium = db.Column(db.String)
     auth_granted = db.Column(db.Boolean)
-    access_token = db.Column(db.String)
+    access_token = db.Column(db.String, nullable=True)
     access_token_expires_at = db.Column(db.Integer)
-    refresh_token = db.Column(db.String)
+    refresh_token = db.Column(db.String, nullable=True)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
     last_activity_check = db.Column(db.DateTime, default=datetime.utcnow)
-    club_member = db.Column(db.Boolean)
-    club_admin = db.Column(db.Boolean)
-
+    club_member = db.Column(db.Boolean, default=False)
+    club_admin = db.Column(db.Boolean, default=False)
+    wavier_verified = db.Column(db.Boolean, default=False)
+    details = db.Column(db.PickleType, nullable=True)
 
     @property
     def is_authenticated(self):
         # override the mixin.. check if revoked elsewhere
         return self.auth_granted
+
+    @property
+    def is_admin(self):
+        # override the mixin.. check if revoked elsewhere
+        return self.club_admin
 
     @property
     def auth_token(self):
@@ -74,12 +76,12 @@ class Athlete(db.Model, UserMixin):
         self.refresh_token = token['refresh_token']
         self.access_token_expires_at = int(token['expires_at'])
         self.last_updated = datetime.utcnow()
-        db.session.commit()
+        # db.session.commit()
 
-    @auth_token.deleter
-    def auth_token(self):
+    def deauthorize(self):
         self.auth_granted = False
-        db.session.commit()
+        self.auth_token = None
+        self.refresh_token = None
 
     def __repr__(self):
         return f'<Athlete: {self.id} {self.username}>'
@@ -104,18 +106,31 @@ class Point(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-class ActivityTag(db.Model):
-    tag = db.Column(db.String(32), primary_key=True)
-    db.relationship('Activity', backref=db.backref('hashtags', lazy=True))
+
+# many to many needs association table
+act_tag_assoc_table = db.Table('act_tag_assoc', db.Model.metadata,
+                               db.Column('tag_id', db.String(32),
+                                         db.ForeignKey('tag.id')),
+                               db.Column('activity_id', db.BigInteger,
+                                         db.ForeignKey('activity.id'))
+                               )
+
+
+class Tag(db.Model):
+    id = db.Column(db.String(32), primary_key=True)
+    activities = db.relationship('Activity',
+                                 secondary=act_tag_assoc_table)
+
 
 class Activity(db.Model):
-    activity_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     athlete_id = db.Column(db.Integer, db.ForeignKey('athlete.id'))
     athlete = db.relationship('Athlete',
                               backref=db.backref('activities', lazy=True))
+    tags = db.relationship('Tag', secondary=act_tag_assoc_table)
     name = db.Column(db.String)
-    description = db.Column(db.String)
-    tags = db.Column(db.String)
+    description = db.Column(db.String, nullable=True)
+    # tags = db.Column(db.String)
     activity_type = db.Column(db.String)
     start_date = db.Column(db.DateTime)
     map_polyline = db.Column(db.Text)
@@ -135,7 +150,7 @@ class Activity(db.Model):
     manual = db.Column(db.Boolean)
     private = db.Column(db.Boolean)
     flagged = db.Column(db.Boolean)
-    
+    details = db.Column(db.PickleType, nullable=True)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
 
 
@@ -154,7 +169,7 @@ class Route(db.Model):
 
 
 class StravaEvent(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     object_id = db.Column(db.Integer)
     obj_asp_type = db.Column(db.String(6))
     athlete_id = db.Column(db.Integer)

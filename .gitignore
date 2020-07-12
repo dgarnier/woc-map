@@ -8,3 +8,4 @@ log/*
 !.elasticbeanstalk/*.global.yml
 secrets.py
 *.sqlite3
+flask_console.log

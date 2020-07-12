@@ -1,21 +1,13 @@
 from flask import Blueprint, jsonify, request, current_app, url_for, send_file
-from flask_login import login_required, current_user
+from flask_login import login_required
 
-from app.auth import oauth
-from app.models import db, Athlete, Activity
+# from app.auth import auth.oauth
+import app.auth as auth
+from app.models import db, Athlete  # , Activity
 
 strava = Blueprint('strava', __name__)
 
 STRAVA_SUBSCRIBE_URL = 'https://www.strava.com/api/v3/push_subscriptions'
-
-
-def get_strava_club_info(api=None, params=None):
-    club = current_app.config['STRAVA_CLUB_ID']
-    url = f"clubs/{club}/{api}" if api else f"clubs/{club}"
-    current_app.logger.info(f'Getting club {api}: {url}')
-    resp = oauth.strava.request('GET', url, params=params)
-    current_app.logger.info(resp)
-    return resp.json()
 
 
 def cvsfileify(dict_list, filename):
@@ -25,7 +17,7 @@ def cvsfileify(dict_list, filename):
     output = io.StringIO()
     keys = list(dict_list[0])
     keys.remove('resource_state')
-    writer = csv.DictWriter(output, keys, 
+    writer = csv.DictWriter(output, keys,
                             extrasaction='ignore', dialect=csv.excel)
     writer.writeheader()
     writer.writerows(dict_list)
@@ -39,6 +31,30 @@ def cvsfileify(dict_list, filename):
     )
 
 
+def deauthorize_athlete_from_token(token):
+    resp = auth.oauth.strava.request(
+        'https://www.strava.com/auth.oauth/deauthorize', token=token)
+    return resp
+
+
+@strava.route('/avatar/<path:path>')
+@login_required
+def avatar(path):
+    # just pass it on to strava
+    url = f'https://strava.com/avatar/{path}'
+    resp = auth.oauth.strava.request('GET', url, params=request.args)
+    return resp.content
+
+
+def get_club_info(api=None, params=None, token=None):
+    club = current_app.config['STRAVA_CLUB_ID']
+    url = f"clubs/{club}/{api}" if api else f"clubs/{club}"
+    current_app.logger.info(f'Getting club {api}: {url}')
+    resp = auth.oauth.strava.request('GET', url, params=params, token=token)
+    current_app.logger.info(resp)
+    return resp.json()
+
+
 # expose club api for authorized users
 @strava.route('/club')
 @strava.route('/club/<api>')
@@ -46,11 +62,11 @@ def cvsfileify(dict_list, filename):
 def club_api(api=None):
     current_app.logger.info(f'requested club api {api}')
     if api.lower().endswith('.csv'):
-        xapi = api.rsplit('.',1)[0]
-        info = get_strava_club_info(xapi, request.args)
+        xapi = api.rsplit('.', 1)[0]
+        info = get_club_info(xapi, request.args)
         return cvsfileify(info, api)
     else:
-        info = get_strava_club_info(api, request.args)
+        info = get_club_info(api, request.args)
         return jsonify(info)
 
 
@@ -61,7 +77,7 @@ def get_activity(athelete, activity_id):
 
 @strava.before_app_first_request
 def check_and_make_subscription():
-    callback_url = url_for('strava.callback', _external=True)
+    callback_url = url_for('strava.webhook', _external=True)
     sub = check_current_subscription()
     if sub:
         if sub["callback_url"] == callback_url:
@@ -90,7 +106,7 @@ def check_current_subscription():
         'client_id': current_app.config['STRAVA_CLIENT_ID'],
         'client_secret': current_app.config['STRAVA_CLIENT_SECRET'],
     }
-    resp = oauth.strava.request(
+    resp = auth.oauth.strava.request(
         'GET', STRAVA_SUBSCRIBE_URL, withhold_token=True, params=params)
     data = resp.json()
     if data:
@@ -105,7 +121,7 @@ def delete_subscription(sub_id):
         'client_id': current_app.config['STRAVA_CLIENT_ID'],
         'client_secret': current_app.config['STRAVA_CLIENT_SECRET'],
     }
-    resp = oauth.strava.request(
+    resp = auth.oauth.strava.request(
         'DELETE', STRAVA_SUBSCRIBE_URL+f'/{sub_id}',
         withhold_token=True, params=params)
     current_app.logger.info(f'Subscription delete: {resp}')
@@ -121,8 +137,8 @@ def subscribe(callback_url):
         'verify_token': current_app.config['STRAVA_VERIFY_TOKEN']
         }
 
-    resp = oauth.strava.request('POST', subscribe_url,
-                                withhold_token=True, params=params)
+    resp = auth.oauth.strava.request('POST', subscribe_url,
+                                     withhold_token=True, params=params)
     current_app.logger.info(f'Strava notification subscription; {resp}')
 
 
@@ -143,12 +159,22 @@ def handle_strava_webhook_event(data):
         if we dont, or its an update, download it again
         save the activity
     """
-    current_app.logger.info('StravaEvent {data}')
+    # current_app.logger.info(f'StravaEvent {data}')
+    id = data['object_id']
+    if data['object_type'] == 'activity':
+        # we need to handle activites here.
+        # FIX ME
+        pass
+    elif data['object_type'] == 'athlete':
+        current_app.logger.info(f'Athlete {id}: '+data['updates'])
+        athlete = Athlete.query.get(id)
+        athlete.deauthorize()
+        db.session.commit()
 
 
 # handle strava webhooks subscriptions
-@strava.route('/callback', methods=['GET', 'POST'])
-def callback():
+@strava.route('/webhook', methods=['GET', 'POST'])
+def webhook():
     # with a GET, strava is just validating
     if request.method == 'GET':
         current_app.logger.info('Strava callback GET subscription validation')
