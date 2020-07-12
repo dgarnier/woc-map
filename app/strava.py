@@ -3,7 +3,7 @@ from flask_login import login_required
 
 # from app.auth import auth.oauth
 import app.auth as auth
-from app.models import db, Athlete  # , Activity
+from app.models import db, admin_required, Athlete  # , Activity
 
 strava = Blueprint('strava', __name__)
 
@@ -32,7 +32,7 @@ def cvsfileify(dict_list, filename):
 
 
 def deauthorize_athlete_from_token(token):
-    resp = auth.oauth.strava.request(
+    resp = auth.oauth.strava.request('GET',
         'https://www.strava.com/auth.oauth/deauthorize', token=token)
     return resp
 
@@ -56,9 +56,9 @@ def get_club_info(api=None, params=None, token=None):
 
 
 # expose club api for authorized users
-@strava.route('/club')
 @strava.route('/club/<api>')
-@login_required
+@strava.route('/club')
+@admin_required
 def club_api(api=None):
     current_app.logger.info(f'requested club api {api}')
     if api and api.lower().endswith('.csv'):
@@ -87,7 +87,7 @@ def check_and_make_subscription():
                                     )
             return
         else:
-            current_app.logger.info('Unexpected subscription: ' +
+            current_app.logger.info(f'Unexpected subscription[{sub["id"]}]: ' +
                                     f'{sub["callback_url"]} != {callback_url}'
                                     )
             if current_app.config.get('FLASK_ENV') == 'production':
