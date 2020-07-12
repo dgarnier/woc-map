@@ -45,14 +45,14 @@ class TestingConfig(Config):
 
 class StagingConfig(Config):
     DEBUG = True
-    # SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('STAGING_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'stage_app.sqlite3')
 
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+    SQLALCHEMY_DATABASE_URI = os.environ.get('PRODUCTION_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'prod_app.sqlite3')
 
 
@@ -60,6 +60,6 @@ app_config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
     'testing': TestingConfig,
-    'eb': StagingConfig,
+    'staging': StagingConfig,
     'default': DevelopmentConfig,
 }
