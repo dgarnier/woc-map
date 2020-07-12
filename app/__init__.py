@@ -1,11 +1,12 @@
 import os
 from flask import Flask, render_template, jsonify, redirect, url_for
+import click
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_required, current_user
 
 from app.models import db
 from app.auth import oauth, auth
-from app.strava import strava
+import app.strava as strava
 
 from config import app_config
 
@@ -25,7 +26,7 @@ db.init_app(app)
 oauth.init_app(app)
 app.register_blueprint(auth)
 
-app.register_blueprint(strava, url_prefix='/strava')
+app.register_blueprint(strava.strava, url_prefix='/strava')
 
 
 @app.route('/')
@@ -105,3 +106,9 @@ def initdb():
     app.logger.info('Initialzing the database.')
     print('Initializing the database.')
     db.create_all()
+
+
+@app.cli.command("webhook-reset")
+@click.argument("subscription_id")
+def webhook_reset(subscription_id):
+    strava.delete_subscription(subscription_id)
