@@ -12,11 +12,12 @@ import app.strava as strava
 def fetch_token(name):
     # fetch the token based on the name of the authenticator
     if name == 'strava':
-        if current_user.is_authorized:
+        if current_user.is_authenticated:
             current_app.logger.info("fetching auth token")
             return current_user.auth_token
     else:
         current_app.logger.error('fetching token but not strava auth')
+        return None
 
 
 @token_update.connect
