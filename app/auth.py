@@ -109,17 +109,18 @@ def handle_authorize(remote, token, user_info):
             athlete.deauthorize()
             flash('You must be a member of the '
                   '<a href="https://www.strava.com/clubs/WheelsofChange">'
-                  'Wheels of Change</a> club on STRAVA to participate', error)
+                  'Wheels of Change</a> club on STRAVA to participate',
+                  'danger')
 
         if 'activity:read' not in request.args.get('scope'):
             athlete.deauthorize()
             flash('You must grant access to read activities to participate',
-                  'error')
+                  'danger')
 
         if not athlete.is_authenticated:
             db.session.commit()
             strava.deauthorize_athlete_from_token(token)
-            return redirect('map')
+            return redirect(url_for('map'))
 
         login_user(athlete, remember=True)
         db.session.commit()

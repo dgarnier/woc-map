@@ -71,16 +71,18 @@ class Athlete(db.Model, UserMixin):
 
     @auth_token.setter
     def auth_token(self, token):
-        self.auth_granted = True
-        self.access_token = token['access_token']
-        self.refresh_token = token['refresh_token']
-        self.access_token_expires_at = int(token['expires_at'])
-        self.last_updated = datetime.utcnow()
-        # db.session.commit()
+        if token:
+            self.auth_granted = True
+            self.access_token = token['access_token']
+            self.refresh_token = token['refresh_token']
+            self.access_token_expires_at = int(token['expires_at'])
+            self.last_updated = datetime.utcnow()
+        else:
+            self.deauthorize()
 
     def deauthorize(self):
         self.auth_granted = False
-        self.auth_token = None
+        self.access_token = None
         self.refresh_token = None
 
     def __repr__(self):
