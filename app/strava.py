@@ -163,7 +163,7 @@ def handle_strava_webhook_event(data):
         if we dont, or its an update, download it again
         save the activity
     """
-    # current_app.logger.info(f'StravaEvent {data}')
+    current_app.logger.debug(f'StravaEvent {data}')
     ev = StravaEvent(
         object_id=data['object_id'],
         object_type=data['object_type'],
@@ -203,7 +203,7 @@ def webhook():
 
     # ok.. now we really can deal with the callback
     # this is a real strava event
-    data = request.get_json(force=True)
+    data = request.get_json()
     handle_strava_webhook_event(data)
 
     return '', 200
