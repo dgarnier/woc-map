@@ -114,8 +114,10 @@ def handle_authorize(remote, token, user_info):
 
         if 'activity:read' not in request.args.get('scope'):
             athlete.deauthorize()
-            flash('You must grant access to read activities to participate',
-                  'danger')
+            flash('You must grant access to read activities to '
+                  "participate. Please <a href='"
+                  f"{url_for('loginpass.login', name='strava')}'>"
+                  "Authorize</a> again.", 'danger')
 
         if not athlete.is_authenticated:
             db.session.commit()

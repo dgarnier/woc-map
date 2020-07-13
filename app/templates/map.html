@@ -51,11 +51,12 @@
 {% if messages %}
 <script>
     {% for category, message in messages %}
+    const cat = '{{ category }}';
     $.notify({
-                message: "{{ message }}"
+                message: "{{ message | safe }}"
              },{
-                type: "{{ category }}",
-                delay: 10000
+                type: cat,
+                delay: (cat == 'danger' ? 0 : 10000)
             }); 
     {% endfor %}
 </script>
