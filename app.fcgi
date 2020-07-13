@@ -20,6 +20,7 @@ class ScriptNameStripper(object):
 
 
 app.config['APPLICATION_ROOT']='/app'
+app.config['FLASK_DEBUG'] = True
 application = ScriptNameStripper(app)
 logging.basicConfig(filename=join(log_dir,'flask_console.log'), level=logging.DEBUG)
 
