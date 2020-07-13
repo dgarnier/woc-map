@@ -77,25 +77,28 @@ def get_activity(athelete, activity_id):
 
 @strava.before_app_first_request
 def check_and_make_subscription():
-    callback_url = url_for('strava.webhook', _external=True)
+    callback_url = url_for('strava.webhook', _external=True, _scheme='https')
     sub = check_current_subscription()
     if sub:
         if sub["callback_url"] == callback_url:
-            current_app.logger.info('Got good subscription: ' +
-                                    f'{sub["callback_url"]}, ' +
-                                    f'updated: {sub["updated_at"]}'
-                                    )
+            current_app.logger.debug('Got good subscription: ' +
+                                     f'{sub["callback_url"]}, ' +
+                                     f'updated: {sub["updated_at"]}'
+                                     )
             return
         else:
-            current_app.logger.info(f'Unexpected subscription[{sub["id"]}]: ' +
-                                    f'{sub["callback_url"]} != {callback_url}'
-                                    )
+            current_app.logger.debug(f'Unexpected subscription[{sub["id"]}]: '
+                                     f'{sub["callback_url"]} != {callback_url}'
+                                     )
             if current_app.config.get('FLASK_ENV') == 'production':
                 # production server rules!
                 delete_subscription(sub["id"])
             else:
                 current_app.logger.info("OK! I'm not production server.")
                 return
+    else:
+        current_app.logger.debug(f"No subscription for {callback_url}")
+
     if 'localhost' not in callback_url:
         # don't be silly
         subscribe(callback_url)
@@ -128,7 +131,8 @@ def delete_subscription(sub_id):
 
 
 def subscribe(callback_url):
-    current_app.logger.info('Subscribing to Strava notifications.')
+    current_app.logger.info('Subscribing to Strava notifications @' +
+                            callback_url)
     subscribe_url = 'https://www.strava.com/api/v3/push_subscriptions'
     params = {
         'client_id': current_app.config['STRAVA_CLIENT_ID'],
@@ -173,7 +177,7 @@ def handle_strava_webhook_event(data):
         # FIX ME
         pass
     elif data['object_type'] == 'athlete':
-        current_app.logger.info(f'Athlete {id}: '+data['updates'])
+        current_app.logger.info(f"Athlete {id}: {data['updates']}")
         athlete = Athlete.query.get(id)
         athlete.deauthorize()
 
