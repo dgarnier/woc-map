@@ -45,7 +45,7 @@ class Athlete(db.Model, UserMixin):
     refresh_token = db.Column(db.String(256), nullable=True)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
-    last_activity_check = db.Column(db.DateTime, default=datetime.utcnow)
+    last_activity_check = db.Column(db.DateTime)
     club_member = db.Column(db.Boolean, default=False)
     club_admin = db.Column(db.Boolean, default=False)
     wavier_verified = db.Column(db.Boolean, default=False)
