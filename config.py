@@ -19,12 +19,6 @@ except ImportError:
             "STRAVA_CLUB_ID"
         STRAVA_VERIFY_TOKEN = os.environ.get("SUBSCRIPTION_VERIFY_TOKEN") or \
             "SUBSCRIPTION_VERIFY_TOKEN"
-        STRAVA_CLIENT_KWARGS = {
-            'response_type': 'code',
-            'approval_prompt': 'auto',
-            'scope': 'read,activity:read',
-            'token_endpoint_auth_method': 'client_secret_post',
-        }
         SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
@@ -36,9 +30,8 @@ class DevelopmentConfig(Config):
 
 
 class TestingConfig(Config):
-    CALL_STRAVA_API = False
     TESTING = True
-    LIVESERVER_PORT = 8943
+    DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'test_app.sqlite3')
 
