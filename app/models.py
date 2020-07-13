@@ -172,8 +172,11 @@ class Route(db.Model):
 
 class StravaEvent(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
-    object_id = db.Column(db.Integer)
+    object_id = db.Column(db.BigInteger)
+    aspect_type = db.Column(db.String(10))
     object_type = db.Column(db.String(10))
-    athlete_id = db.Column(db.Integer)
-    updates = db.Column(db.String(50))
+    owner_id = db.Column(db.Integer)
+    updates = db.Column(db.Text)
+    event_time = db.Column(db.BigInteger)
+    subscription_id = db.Column(db.BigInteger)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
