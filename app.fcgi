@@ -2,7 +2,11 @@
 
 import os, sys
 from os.path import *
+
+os.environ['FLASK_ENV']='production'
+
 from flup.server.fcgi import WSGIServer
+
 from app import app
 import logging
 
