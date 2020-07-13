@@ -108,7 +108,7 @@ def handle_authorize(remote, token, user_info):
             # reject the authorization and fail.
             athlete.deauthorize()
             flash('You must be a member of the '
-                  '<a href="https://www.strava.com/clubs/WheelsofChange">'
+                  "<a href='https://www.strava.com/clubs/WheelsofChange'>"
                   'Wheels of Change</a> club on STRAVA to participate',
                   'danger')
 
