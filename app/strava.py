@@ -32,8 +32,8 @@ def cvsfileify(dict_list, filename):
 
 
 def deauthorize_athlete_from_token(token):
-    resp = auth.oauth.strava.request('GET',
-        'https://www.strava.com/auth.oauth/deauthorize', token=token)
+    resp = auth.oauth.strava.request(
+        'GET', 'https://www.strava.com/auth.oauth/deauthorize', token=token)
     return resp
 
 
