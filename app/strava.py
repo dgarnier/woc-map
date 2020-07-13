@@ -164,14 +164,7 @@ def handle_strava_webhook_event(data):
         save the activity
     """
     current_app.logger.debug(f'StravaEvent {data}')
-    #ev = StravaEvent(
-    #    object_id=data['object_id'],
-    #    object_type=data['object_type'],
-    #    athlete_id=data.get('athlete_id'),
-    #    updates=data.get('updates')
-    #)
-    ev = StravaEvent(*data)
-    
+    ev = StravaEvent(**data)
     db.session.add(ev)
 
     if data['object_type'] == 'activity':
