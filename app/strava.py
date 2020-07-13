@@ -3,7 +3,7 @@ from flask_login import login_required
 
 # from app.auth import auth.oauth
 import app.auth as auth
-from app.models import db, admin_required, Athlete  # , Activity
+from app.models import db, admin_required, Athlete, StravaEvent  # , Activity
 
 strava = Blueprint('strava', __name__)
 
@@ -160,7 +160,14 @@ def handle_strava_webhook_event(data):
         save the activity
     """
     # current_app.logger.info(f'StravaEvent {data}')
-    id = data['object_id']
+    ev = StravaEvent(
+        object_id=data['object_id'],
+        object_type=data['object_type'],
+        athlete_id=data.get('athlete_id'),
+        updates=data.get('updates')
+    )
+    db.session.add(ev)
+
     if data['object_type'] == 'activity':
         # we need to handle activites here.
         # FIX ME
@@ -169,7 +176,8 @@ def handle_strava_webhook_event(data):
         current_app.logger.info(f'Athlete {id}: '+data['updates'])
         athlete = Athlete.query.get(id)
         athlete.deauthorize()
-        db.session.commit()
+
+    db.session.commit()
 
 
 # handle strava webhooks subscriptions
