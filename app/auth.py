@@ -24,6 +24,8 @@ def fetch_token(name):
 def on_token_update(sender, name, token, refresh_token=None,
                     access_token=None):
     # after an automatic refresh of a token.. have to look it up
+    # this can get called with a "bad token message"
+
     if name == 'strava':
         strava_update_token(token, refresh_token=refresh_token,
                             access_token=access_token)
@@ -39,8 +41,14 @@ def strava_update_token(token, refresh_token=None, access_token=None):
             return
 
         current_app.logger.debug(f'update token: {token}')
-        ath.auth_token = token
-        # ath.save()
+
+        if token.get('message') == 'Bad Request':
+            # this is likely a bad token.. need to just reject the token
+            current_app.logger.warn(f'Bad refresh token for: {auth.id}')
+            ath.deauthorize()
+        else:
+            current_app.logger.info(f'Token refreshed for: {auth.id}')
+            ath.auth_token = token
         db.session.commit()
 
 

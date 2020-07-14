@@ -49,7 +49,7 @@ def avatar(path):
 def get_club_info(api=None, params=None, token=None):
     club = current_app.config['STRAVA_CLUB_ID']
     url = f"clubs/{club}/{api}" if api else f"clubs/{club}"
-    current_app.logger.info(f'Getting club {api}: {url}')
+    current_app.logger.info(f'Getting: {url}')
     resp = auth.oauth.strava.request('GET', url, params=params, token=token)
     current_app.logger.info(resp)
     return resp.json()
