@@ -28,6 +28,9 @@ app.config['FLASK_DEBUG'] = True
 application = ScriptNameStripper(app)
 logging.basicConfig(filename=join(log_dir,'flask_console.log'), level=logging.DEBUG)
 
+# limiting threads doesn't seem to help
+# but the (default) threading server is the one that 
+# people say is compatible with FastCGI in dynamic mode (.htaccess enabled)
 #WSGIServer(application, maxThreads=8).run()
 WSGIServer(application).run()
 
