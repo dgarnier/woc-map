@@ -17,7 +17,7 @@ def fetch_token(name):
             return current_user.auth_token
     else:
         current_app.logger.error('fetching token but not strava auth')
-        return None
+    return None
 
 
 @token_update.connect
