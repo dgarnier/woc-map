@@ -5,7 +5,13 @@ AddHandler fcgid-script .fcgi
 #Alias /wocapp/static/ /home1/wheelsp5/public_html/wocapp/app/static/
 #ScriptAlias /wocapp/ /home1/wheelsp5/public_html/wocapp/app.fcgi/
 
+# FCGID cant be configured from a .htaccess file.. or can it?
+
 RewriteEngine On
+# not sure if this line is necessary, but doesn't hurt
 RewriteCond %{REQUEST_FILENAME} !=/home1/wheelsp5/public_html/app/app.fcgi
-RewriteCond %{REQUEST_FILENAME} !-f
+# don't match the static files.. so Apache sends those
+# don't replace this with a general !-f because then people could get at 
+# the source code (which has secrets)
+RewriteCond %{REQUEST_FILENAME} !=/home1/wheelsp5/public_html/app/static/(.*)
 RewriteRule ^(.*)$ app.fcgi/$1 [QSA,L]
