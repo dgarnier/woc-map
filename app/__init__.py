@@ -3,6 +3,7 @@ from flask import Flask, render_template, jsonify, redirect, url_for
 import click
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager, login_required, current_user
+from flask_migrate import Migrate
 
 from app.models import db
 from app.auth import oauth, auth
@@ -22,6 +23,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 db.init_app(app)
+migrate = Migrate(app, db)
 
 oauth.init_app(app)
 app.register_blueprint(auth)
