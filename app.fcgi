@@ -28,6 +28,10 @@ class ScriptNameStripper(object):
 app.config['APPLICATION_ROOT'] = '/app'
 application = ScriptNameStripper(app)
 
+# limiting threads doesn't seem to help
+# but the (default) threading server is the one that 
+# people say is compatible with FastCGI in dynamic mode (.htaccess enabled)
+
 logging.basicConfig(filename=join(log_dir, 'flask_console.log'),
                     format='%(asctime)s %(levelname)-8s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
