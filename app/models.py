@@ -67,7 +67,8 @@ class Athlete(db.Model, UserMixin):
             access_token=self.access_token,
             refresh_token=self.refresh_token,
             expires_at=self.access_token_expires_at
-        ) if self.auth_granted else None
+        )
+        # if self.auth_granted else None
 
     @auth_token.setter
     def auth_token(self, token):
