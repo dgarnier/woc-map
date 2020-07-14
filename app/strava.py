@@ -166,8 +166,8 @@ def handle_strava_webhook_event(data):
     current_app.logger.debug(f'StravaEvent {data}')
 
     # convert to string since database doesn't have json type
-    updates = data.get('updates')
-    data['updates'] = str(updates) 
+    # updates = data.get('updates')
+    # data['updates'] = str(updates) 
     ev = StravaEvent(**data)
     db.session.add(ev)
 
