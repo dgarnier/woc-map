@@ -40,9 +40,9 @@ class Athlete(db.Model, UserMixin):
     profile = db.Column(db.String(256))
     profile_medium = db.Column(db.String(256))
     auth_granted = db.Column(db.Boolean)
-    access_token = db.Column(db.Text, nullable=True)
+    access_token = db.Column(db.String(8192), nullable=True)
     access_token_expires_at = db.Column(db.Integer)
-    refresh_token = db.Column(db.Text, nullable=True)
+    refresh_token = db.Column(db.String(8192), nullable=True)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
     last_activity_check = db.Column(db.DateTime)
@@ -129,7 +129,7 @@ class Tag(db.Model):
 
 class Activity(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
-    athlete_id = db.Column(db.Integer, db.ForeignKey('athlete.id'))
+    athlete_id = db.Column(db.BigInteger, db.ForeignKey('athlete.id'), nullable=False)
     athlete = db.relationship('Athlete',
                               backref=db.backref('activities', lazy=True))
     tags = db.relationship('Tag', secondary=act_tag_assoc_table)
@@ -179,7 +179,7 @@ class StravaEvent(db.Model):
     aspect_type = db.Column(db.String(10))
     object_type = db.Column(db.String(10))
     owner_id = db.Column(db.BigInteger)
-    updates = db.Column(db.JSON)
+    updates = db.Column(db.TEXT)
     event_time = db.Column(db.BigInteger)
     subscription_id = db.Column(db.BigInteger)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
