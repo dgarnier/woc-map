@@ -30,16 +30,18 @@ def on_token_update(sender, name, token, refresh_token=None,
 
 
 def strava_update_token(token, refresh_token=None, access_token=None):
-    if refresh_token:
-        ath = Athlete.query.filter_by(refresh_token=refresh_token).first()
-    elif access_token:
-        ath = Athlete.query.filter_by(access_token=access_token).first()
-    else:
-        return
+    with current_app.app_context():
+        if refresh_token:
+            ath = Athlete.query.filter_by(refresh_token=refresh_token).first()
+        elif access_token:
+            ath = Athlete.query.filter_by(access_token=access_token).first()
+        else:
+            return
 
-    ath.auth_token = token
-    # ath.save()
-    db.session.commit()
+        current_app.logger.debug(f'update token: {token}')
+        ath.auth_token = token
+        # ath.save()
+        db.session.commit()
 
 
 def handle_authorize(remote, token, user_info):
