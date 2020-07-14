@@ -71,14 +71,17 @@ class Athlete(db.Model, UserMixin):
 
     @auth_token.setter
     def auth_token(self, token):
-        if token:
+        if isinstance(token, dict):
             self.auth_granted = True
-            self.access_token = token['access_token']
-            self.refresh_token = token['refresh_token']
-            self.access_token_expires_at = int(token['expires_at'])
+            self.access_token = token.get('access_token')
+            self.refresh_token = token.get('refresh_token')
+            self.access_token_expires_at = int(token.get('expires_at'))
             self.last_updated = datetime.utcnow()
         else:
-            self.deauthorize()
+            if token:
+                current_app.logger.debug(f'unexpected token: {token}')
+            else:
+                self.deauthorize()
 
     def deauthorize(self):
         self.auth_granted = False
