@@ -87,7 +87,7 @@ def handle_authorize(remote, token, user_info):
         if athlete is None:         # new athlete!
             # there's a lot of info in the token, more than in user_info.
             athlete = Athlete(
-                id=ai['id'], username=ai['username'],
+                _id=ai['id'], username=ai['username'],
                 firstname=ai['firstname'], lastname=ai['lastname'],
                 city=ai['city'], state=ai['state'], country=ai['country'],
                 profile=ai['profile'], profile_medium=ai['profile_medium']
