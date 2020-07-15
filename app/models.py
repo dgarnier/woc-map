@@ -90,7 +90,10 @@ class Athlete(db.Model, UserMixin):
         self.refresh_token = None
 
     def __repr__(self):
-        return f'<Athlete: {self.id} {self.username}>'
+        return f'<Athlete {self.id}: {self.firstname} {self.lastname}>'
+
+    def __str__(self):
+        return f'{self.firstname} {self.lastname}'
 
 
 class Point(object):
