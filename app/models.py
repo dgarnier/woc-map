@@ -51,6 +51,9 @@ class Athlete(db.Model, UserMixin):
     wavier_verified = db.Column(db.Boolean, default=False)
     details = db.Column(db.JSON, nullable=True)
 
+    def get_id(self):
+        return self._id
+
     @property
     def is_authenticated(self):
         # override the mixin.. check if revoked elsewhere
