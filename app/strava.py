@@ -4,32 +4,12 @@ from flask_login import login_required
 
 # from app.auth import auth.oauth
 import app.auth as auth
+import app.utils as utils
 from app.models import db, admin_required, Athlete, StravaEvent  # , Activity
 
 strava = Blueprint('strava', __name__)
 
 STRAVA_SUBSCRIBE_URL = 'https://www.strava.com/api/v3/push_subscriptions'
-
-
-def cvsfileify(dict_list, filename):
-    import io
-    import csv
-
-    output = io.StringIO()
-    keys = list(dict_list[0])
-    keys.remove('resource_state')
-    writer = csv.DictWriter(output, keys,
-                            extrasaction='ignore', dialect=csv.excel)
-    writer.writeheader()
-    writer.writerows(dict_list)
-    csv_string = output.getvalue()
-    mem = io.BytesIO(csv_string.encode('utf-8'))
-    return send_file(
-        mem,
-        as_attachment=True,
-        attachment_filename=filename,
-        mimetype='text/csv'
-    )
 
 
 def deauthorize_athlete_from_token(token):
@@ -80,7 +60,7 @@ def club_api(api=None):
     if api and api.lower().endswith('.csv'):
         xapi = api.rsplit('.', 1)[0]
         info = get_club_info(xapi, request.args)
-        return cvsfileify(info, api)
+        return utils.cvsfileify(info, api)
     else:
         info = get_club_info(api, request.args)
         return jsonify(info)

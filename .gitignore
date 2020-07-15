@@ -9,3 +9,4 @@ log/*
 secrets.py
 *.sqlite3
 flask_console.log
+node_modules
