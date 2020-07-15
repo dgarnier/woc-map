@@ -172,9 +172,12 @@ def handle_strava_webhook_event(data):
         # FIX ME
         pass
     elif data['object_type'] == 'athlete':
-        current_app.logger.info(f"Athlete {id}: {data['updates']}")
-        athlete = Athlete.query.get(id)
-        athlete.deauthorize()
+        oid = data.get('object_id')
+        if oid:
+            oid = int(oid)
+            current_app.logger.info(f"Athlete {oid}: {data['updates']}")
+            athlete = Athlete.query.get(oid)
+            athlete.deauthorize()
 
     db.session.commit()
 
