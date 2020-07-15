@@ -161,6 +161,10 @@ def handle_strava_webhook_event(data):
     """
     current_app.logger.debug(f'StravaEvent {data}')
 
+    # ignore certain events
+    if 'update' not in data.get('aspect_type'):
+        return
+
     # convert to string
     updates = data.get('updates')
     data['updates'] = str(updates) 
