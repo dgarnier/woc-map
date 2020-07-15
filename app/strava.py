@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, request, current_app, url_for, send_file
+from flask import Blueprint, jsonify, request, current_app, url_for
+from flask import send_file, redirect, flash
 from flask_login import login_required
 
 # from app.auth import auth.oauth
@@ -37,7 +38,7 @@ def deauthorize_athlete_from_token(token):
     return resp
 
 
-@strava.route('/deauthorize/<id>')
+@strava.route('/deauthorize/<athlete_id>')
 @admin_required
 def deauthorize(athlete_id):
     id = int(athlete_id)
@@ -45,9 +46,12 @@ def deauthorize(athlete_id):
     current_app.logger.info(f'Deauthorizing {id}:{athlete.firstname}')
     resp = deauthorize_athlete_from_token(athlete.auth_token)
     if resp.ok:
+        # if ok..  response returns access token
+        # but just access token, not full token
         athlete.deauthorize()
         db.session.commit()
-    return jsonify(resp.json())
+        flash(f'Athlete {athlete} deauthorized.')
+    return redirect(url_for('map'))
 
 
 @strava.route('/avatar/<path:path>')
