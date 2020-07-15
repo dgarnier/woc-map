@@ -41,9 +41,8 @@ def deauthorize_athlete_from_token(token):
 @strava.route('/deauthorize/<athlete_id>')
 @admin_required
 def deauthorize(athlete_id):
-    id = int(athlete_id)
-    athlete = Athlete.query.get(id)
-    current_app.logger.info(f'Deauthorizing {id}:{athlete.firstname}')
+    athlete = Athlete.query.get(int(athlete_id)
+    current_app.logger.info(f'Deauthorizing {athlete_id}:{athlete.firstname}')
     resp = deauthorize_athlete_from_token(athlete.auth_token)
     if resp.ok:
         # if ok..  response returns access token
