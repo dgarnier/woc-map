@@ -47,10 +47,10 @@ def strava_update_token(token, refresh_token=None, access_token=None):
 
         if token.get('message') == 'Bad Request':
             # this is likely a bad token.. need to just reject the token
-            current_app.logger.warn(f'Bad refresh token for: {ath.id}')
+            current_app.logger.warn(f'Bad refresh token for: {ath}')
             ath.deauthorize()
         else:
-            current_app.logger.info(f'Token refreshed for: {ath.id}')
+            current_app.logger.info(f'Token refreshed for: {ath}')
             ath.auth_token = token
         db.session.commit()
 
