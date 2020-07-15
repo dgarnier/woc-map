@@ -30,7 +30,7 @@ def admin_required(func):
 
 class Athlete(db.Model, UserMixin):
     "Strava Athelete and user"
-    id = db.Column(db.BigInteger, primary_key=True)
+    _id = db.Column(db.BigInteger, primary_key=True)
     username = db.Column(db.String(256))
     firstname = db.Column(db.String(256))
     lastname = db.Column(db.String(256))
@@ -90,7 +90,7 @@ class Athlete(db.Model, UserMixin):
         self.refresh_token = None
 
     def __repr__(self):
-        return f'<Athlete {self.id}: {self.firstname} {self.lastname}>'
+        return f'<Athlete {self._id}: {self.firstname} {self.lastname}>'
 
     def __str__(self):
         return f'{self.firstname} {self.lastname}'
@@ -119,21 +119,21 @@ class Point(object):
 # many to many needs association table
 act_tag_assoc_table = db.Table('act_tag_assoc', db.Model.metadata,
                                db.Column('tag_id', db.String(32),
-                                         db.ForeignKey('tag.id')),
+                                         db.ForeignKey('tag._id')),
                                db.Column('activity_id', db.BigInteger,
-                                         db.ForeignKey('activity.id'))
+                                         db.ForeignKey('activity._id'))
                                )
 
 
 class Tag(db.Model):
-    id = db.Column(db.String(32), primary_key=True)
+    _id = db.Column(db.String(32), primary_key=True)
     activities = db.relationship('Activity',
                                  secondary=act_tag_assoc_table)
 
 
 class Activity(db.Model):
-    id = db.Column(db.BigInteger, primary_key=True)
-    athlete_id = db.Column(db.BigInteger, db.ForeignKey('athlete.id'), nullable=False)
+    _id = db.Column(db.BigInteger, primary_key=True)
+    athlete_id = db.Column(db.BigInteger, db.ForeignKey('athlete._id'), nullable=False)
     athlete = db.relationship('Athlete',
                               backref=db.backref('activities', lazy=True))
     tags = db.relationship('Tag', secondary=act_tag_assoc_table)
@@ -164,7 +164,7 @@ class Activity(db.Model):
 
 
 class Route(db.Model):
-    route_id = db.Column(db.Integer, primary_key=True)
+    _id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer)
     event_order = db.Column(db.Integer)
     alternative = db.Column(db.Boolean)
@@ -178,7 +178,7 @@ class Route(db.Model):
 
 
 class StravaEvent(db.Model):
-    id = db.Column(db.BigInteger, primary_key=True)
+    _id = db.Column(db.BigInteger, primary_key=True)
     object_id = db.Column(db.BigInteger)
     aspect_type = db.Column(db.String(10))
     object_type = db.Column(db.String(10))
