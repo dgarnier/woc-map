@@ -24,7 +24,7 @@ routes = [
 
 for name, route in routes:
     os.system(f'curl -o {name}.tcx {route}.tcx')
-    json = tcx_to_geojson('{name}.tcx', course=True)
+    json = tcx_to_geojson(f'{name}.tcx', course=True)
     # might make a big single geojson file
-    with open(f'{name}.geojson', 'w') as f:
-        f.write(json,  encoding='utf-8')
+    with open(f'{name}.geojson', 'w', encoding='utf-8') as f:
+        f.write(json)
