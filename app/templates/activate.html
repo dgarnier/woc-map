@@ -17,7 +17,7 @@
 		<div>Please connect to Strava so your rides will be credited</div>
 		<div class="wocstravalegal"><strong>Why do we need your authorization?</strong><br>In order to add your ride to the map, you need to authorize us to connect to your Strava public activities. We respect your privacy - we will only upload publicly available data. You can deauthorize our access at any time using the <a href="https://www.strava.com/settings/apps" title="Strava settings" class="woclink" target="_blank">Settings/My Apps</a> feature on the Strava website.</div>
 	</div>
-	<iframe class="middle" src="{{ url_for('map') }}"> </iframe> 
+	<iframe class="middle" src="{{ url_for('main.map') }}"> </iframe> 
 </div>
 <div class="bottom">
 	<img alt="Powered by STRAVA" src="{{ url_for('static', filename = 'img/api_logo_pwrdBy_strava_horiz_light.svg') }}"

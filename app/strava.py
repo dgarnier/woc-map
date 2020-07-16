@@ -30,7 +30,7 @@ def deauthorize(athlete_id):
         athlete.deauthorize()
         db.session.commit()
         flash(f'Athlete {athlete} deauthorized.')
-    return redirect(url_for('map'))
+    return redirect(url_for('main.map'))
 
 
 @strava.route('/avatar/<path:path>')
@@ -90,7 +90,9 @@ def check_and_make_subscription():
                 # production server rules!
                 delete_subscription(sub["id"])
             else:
-                current_app.logger.info("OK! I'm not production server.")
+                current_app.logger.info(
+                    f"OK! I'm {current_app.config.get('FLASK_ENV')}, "
+                    "not production server.")
                 return
     else:
         current_app.logger.debug(f"No subscription for {callback_url}")
@@ -167,7 +169,7 @@ def handle_strava_webhook_event(data):
 
     # convert to string
     updates = data.get('updates')
-    data['updates'] = str(updates) 
+    data['updates'] = str(updates)
     ev = StravaEvent(**data)
     db.session.add(ev)
 

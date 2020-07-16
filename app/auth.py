@@ -66,11 +66,11 @@ def handle_authorize(remote, token, user_info):
             error = request.args.get('error')
             if error == 'access_denied':
                 flash('Strava access Denied.\n' +
-                      f"Please <a href={url_for('activate')}>" +
+                      f"Please <a href={url_for('main.activate')}>" +
                       "activate</a> to contribute.", 'error')
             else:
                 flash('Strava: Invalid response.', 'error')
-            return redirect(url_for('map'))
+            return redirect(url_for('main.map'))
         # woot.. got authorization token.  Lets save it and the user...
 
         def fix_bad_link(a, link):
@@ -135,15 +135,15 @@ def handle_authorize(remote, token, user_info):
         if not athlete.is_authenticated:
             db.session.commit()
             strava.deauthorize_athlete_from_token(token)
-            return redirect(url_for('map'))
+            return redirect(url_for('main.map'))
 
         login_user(athlete, remember=True)
         db.session.commit()
 
         flash("Login successful. Let's do this!", 'success')
         # return render_template('user_info.html', user_info=user_info)
-        # return redirect(url_for('user_info'))
-        return redirect(url_for('map'))
+        # return redirect(url_for('main.user_info'))
+        return redirect(url_for('main.map'))
 
 
 # get the oauth session, which also has a requests interface
