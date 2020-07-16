@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{{url_for('static', filename='css/leaflet-messagebox.css')}}"> 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"> 
     -->
-
+    
     <style>
         html, body {
             height: 100%;
@@ -33,6 +33,12 @@
         width: 100%;
         /* display: inline-block; */
         }
+        #strava_btn {
+            /*
+            background: url("{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}") no-repeat;
+            */
+            padding: 0px 0px;
+        }
     </style>
 {% endblock %}
 
@@ -44,14 +50,18 @@
 <script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
 <script src="{{ url_for('static', filename='js/leaflet.restoreview.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap-notify.js') }}"></script>
-<!-- <script src="{{ url_for('static', filename='js/Polyline.encoded.js') }}"></script>
+<script src="{{ url_for('static', filename='js/Leaflet.Control.Custom.js') }}"></script>
+
+<!-- 
+<script src="{{ url_for('static', filename='js/Polyline.encoded.js') }}"></script>
 <script src="{{ url_for('static', filename='js/leaflet-messagebox.js') }}"></script>
+<script src="{{ url_for('static', filename='js/easy-button.js') }}"></script>
  -->
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 <script>
     {% for category, message in messages %}
-    const cat = '{{ category }}';
+    let cat = '{{ category }}';
     $.notify({
                 message: "{{ message | safe }}"
              },{
@@ -200,6 +210,57 @@
 
     stravamark = L.control.stravamark({ position: 'bottomleft' });
 
+    {% if user_info.anonymous %}
+
+    /*
+    avatar = L.easyButton(
+        "{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}",
+        function(btn, map) {
+             window.location = "{{ url_for('loginpass.login', name='strava') }}";
+        },
+        "Login or Authorize with STRAVA"
+    );
+    */
+
+    avatar = L.control.custom({
+        position: 'bottomright',
+        content: '<button id="strava_btn">' + 
+            '<img id="strava_img" src="{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}">' +
+            '</button>',
+        style: {
+//            margin: {0, 0, 0, 0}
+        },
+        events: {
+            click: function(data) {
+                window.location.href = "{{ url_for('loginpass.login', name='strava') }}";
+            },
+        }
+    });
+    /*
+    L.Control.Avatar = L.Control.extend({
+        container: null,
+        onAdd: function (map) {
+            this.container = L.DomUtil.create('div');
+            var img = L.DomUtil.create('img');
+            img.src = "{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}";
+            //img.style.borderRadius = '50%';
+            //img.style.height = '70px';
+            $('#img').on('click', (e) => {
+                 window.location = "{{ url_for('loginpass.login', name='strava') }}";
+            });
+            return img;
+        },
+
+        onRemove: function (map) {
+        // Nothing to do here
+        }
+    });
+    
+    avatar = new L.Control.Avatar({ position: 'bottomright' });
+    */
+
+    {% else %}
+    
     L.Control.Avatar = L.Control.extend({
         onAdd: function (map) {
             var img = L.DomUtil.create('img');
@@ -217,8 +278,10 @@
     L.control.avatar = function (opts) {
         return new L.Control.Avatar(opts);
     }
-
     avatar = L.control.avatar({ position: 'bottomright' });
+
+    {% endif %}
+
 
     function inIframe () {
         // safe in different broswers 
@@ -232,7 +295,9 @@
     if (inIframe() == false) {
         // not in an iframe
         layer_control.addTo(map);
+        {% if not user_info.anonymous %}
         stravamark.addTo(map);
+        {% endif %}
         avatar.addTo(map);
         //console.log('not in iFrame');
     } else {
