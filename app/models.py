@@ -136,7 +136,8 @@ class Tag(db.Model):
 
 class Activity(db.Model):
     _id = db.Column(db.BigInteger, primary_key=True)
-    athlete_id = db.Column(db.BigInteger, db.ForeignKey('athlete._id'), nullable=False)
+    athlete_id = db.Column(db.BigInteger, db.ForeignKey('athlete._id'),
+                           nullable=False)
     athlete = db.relationship('Athlete',
                               backref=db.backref('activities', lazy=True))
     tags = db.relationship('Tag', secondary=act_tag_assoc_table)

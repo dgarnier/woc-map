@@ -1,11 +1,15 @@
-# awseb wants things called application
-from app import app as application
-import logging
-from os.path import *
+import os
+from app import create_app
+
+
+os.environ['FLASK_ENV'] = 'staging'
+os.environ['FLASK_CONFIG'] = 'staging'
+os.environ['FLASK_DEBUG'] = '1'
+
+application = create_app('staging')
+application.debug = True
+
+print(application.config.__dict__)
 
 if __name__ == '__main__':
-    application.debug = True
-    logging.basicConfig(filename=join(
-        dirname(abspath(__file__)), 'flask_console.log'), level=logging.DEBUG)
-
     application.run()

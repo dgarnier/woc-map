@@ -4,11 +4,13 @@ import os
 from os.path import dirname, abspath, join
 from flup.server.fcgi import WSGIServer
 import logging
+from app import create_app
+
 
 os.environ['FLASK_ENV'] = 'production'
 os.environ['FLASK_DEBUG'] = '1'
 
-from app import app
+app = create_app('production')
 
 code_dir = dirname(abspath(__file__))
 # log_dir = join(code_dir,'log')

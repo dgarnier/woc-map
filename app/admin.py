@@ -7,3 +7,4 @@ import app.auth as auth
 from app.models import db, admin_required, Athlete, StravaEvent  # , Activity
 
 admin = Blueprint('admin', __name__)
+
