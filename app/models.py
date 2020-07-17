@@ -22,7 +22,8 @@ def admin_required(func):
     def decorated_view(*args, **kwargs):
         if current_app.config.get('LOGIN_DISABLED'):
             return func(*args, **kwargs)
-        elif not current_user.is_admin:
+        elif not (current_user.is_authenticated and
+                  current_user.is_admin):
             return current_app.login_manager.unauthorized()
         return func(*args, **kwargs)
     return decorated_view

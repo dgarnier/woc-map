@@ -15,6 +15,11 @@ def index():
     return redirect(url_for('main.map'))
 
 
+@main.route('/favicon.ico')
+def favicon():
+    return redirect(url_for('static', filename='favicon.ico'), code=301)
+
+
 @main.route('/map')
 def map():
     if current_user.is_anonymous:
