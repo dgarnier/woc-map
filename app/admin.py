@@ -25,13 +25,13 @@ def athletes():
     athlete_dicts = dict_gen(athletes)
     ext = request.args.get('ext')
 
-    if (ext.lower() in ['.csv', '.txt']):
+    if ext and ext.lower() in ['csv', 'txt']:
         keys = ['_id', 'firstname', 'lastname', 'city', 'state', 'country',
                 'auth_granted', 'club_member', 'club_admin', 'waiver_verified']
 
         return utils.cvsfileify(athlete_dicts, keys, 'athletes'+ext)
     else:
-        return jsonify(athlete_dicts)
+        return jsonify(list(athlete_dicts))
 
 @admin.route('/')
 @admin_required
