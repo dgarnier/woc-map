@@ -33,7 +33,15 @@ def athletes():
     else:
         return jsonify(list(athlete_dicts))
 
+
 @admin.route('/')
 @admin_required
 def index():
-    return render_template('admin.html')
+    stats = {}
+    stats['good_athletes'] = db.session.query(Athlete.auth_granted).\
+        filter(Athlete.auth_granted).count()
+    stats['incomplete'] = db.session.query(Athlete.auth_granted).\
+        filter(Athlete.auth_granted == False).count()
+    stats['wocblm_updates'] = db.session.query(StravaEvent.updates).\
+        filter(StravaEvent.updates.match('#WOCBLM')).count()
+    return render_template('admin.html', stats=stats)
