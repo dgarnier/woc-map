@@ -10,6 +10,10 @@
         padding: 10px;
     }
 
+    .left {
+        text-align: left;
+    }
+
     div {
         /* width: 200px; */
         margin: 30px;
@@ -59,6 +63,17 @@
 
 {% block content %}
 <div class="center">
+    <h2>Some statistics</h3>
+    <div class='left'>
+    <table>
+        {% for key, value in stats.items() %}
+        <tr>
+            <th> {{ key }} </th>
+            <td> {{ value }} </td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
     <h2>Some admin functions</h2>
     <ul>
         <li><a href="{{ url_for('.athletes', ext='csv') }}">"Step #3" Athletes (CSV)</a></li>
