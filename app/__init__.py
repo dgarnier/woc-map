@@ -9,6 +9,7 @@ from app.models import db
 from app.auth import oauth, auth
 from app.main import main
 import app.strava as strava
+import app.admin as admin
 
 from config import app_config
 
@@ -36,6 +37,7 @@ def create_app(configuration='default'):
     app.register_blueprint(main)
 
     app.register_blueprint(strava.strava, url_prefix='/strava')
+    app.register_blueprint(admin.admin, url_prefix='/admin')
 
     @app.cli.command()
     def initdb():

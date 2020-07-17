@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, request, current_app, url_for
-from flask import send_file, redirect, flash
+from flask import (Blueprint, jsonify, request, current_app, url_for,
+                   redirect, flash)
 from flask_login import login_required
 
 # from app.auth import auth.oauth
@@ -60,7 +60,9 @@ def club_api(api=None):
     if api and api.lower().endswith('.csv'):
         xapi = api.rsplit('.', 1)[0]
         info = get_club_info(xapi, request.args)
-        return utils.cvsfileify(info, api)
+        keys = list(info[0])
+        keys.remove('resource_state')
+        return utils.cvsfileify(info, keys, api)
     else:
         info = get_club_info(api, request.args)
         return jsonify(info)
@@ -109,10 +111,10 @@ def check_current_subscription():
     }
     resp = auth.oauth.strava.request(
         'GET', STRAVA_SUBSCRIBE_URL, withhold_token=True, params=params)
-    data = resp.json()
-    if data:
+    
+    if resp.ok and resp.json():
         # only one allowed
-        return data[0]
+        return resp.json()[0]
     else:
         return None
 
