@@ -1,8 +1,10 @@
 from functools import wraps
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, current_user
 from flask import current_app
+from flask_login import UserMixin, current_user
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import NoResultFound
 
 
 class SQLA(SQLAlchemy):
@@ -192,3 +194,22 @@ class StravaEvent(db.Model):
     event_time = db.Column(db.BigInteger)
     subscription_id = db.Column(db.BigInteger)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+def get_or_create(model, defaults=None, **kwargs):
+    """
+    Get or create a model instance while preserving integrity.
+    uses same as django.. returns if it had to create
+    """
+    try:
+        return db.session.query(model).filter_by(**kwargs).one(), False
+    except NoResultFound:
+        if defaults is not None:
+            kwargs.update(defaults)
+        try:
+            with db.session.begin_nested():
+                instance = model(**kwargs)
+                db.session.add(instance)
+                return instance, True
+        except IntegrityError:
+            return db.session.query(model).filter_by(**kwargs).one(), False
