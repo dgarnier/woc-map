@@ -20,6 +20,7 @@ def create_app(configuration='default'):
     app.config.from_object(app_config[configuration])
     # app_config[configuration].init_app(app)
     app.logger.info(f'Configuration: {configuration}')
+    app.logger.info(f"SERVER_NAME: { app.config.get('SERVER_NAME') }")
 
     bs = Bootstrap()
     bs.init_app(app)
