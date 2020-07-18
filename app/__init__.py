@@ -1,4 +1,3 @@
-import os
 from flask import Flask
 import click
 from flask_bootstrap import Bootstrap
@@ -11,10 +10,10 @@ from app.main import main
 import app.strava as strava
 import app.admin as admin
 
-from config import app_config
-
 
 def create_app(configuration='default'):
+    # don't import app_config until needed
+    from config import app_config
 
     app = Flask(__name__)
 

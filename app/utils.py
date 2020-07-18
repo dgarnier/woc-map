@@ -1,5 +1,6 @@
 import io
 import csv
+import re
 from flask import send_file
 
 
@@ -17,3 +18,8 @@ def cvsfileify(dict_list, keys, filename):
                      attachment_filename=filename,
                      mimetype='text/csv'
                      )
+
+
+def hashtags(line):
+    tags = re.split('[ \.,;:&\?\t\n]', line.lower())
+    return set([i[1:] for i in tags if i.startswith("#")])
