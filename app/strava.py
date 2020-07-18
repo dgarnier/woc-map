@@ -176,6 +176,7 @@ def handle_strava_webhook_event(data):
     db.session.add(ev)
 
     if data['object_type'] == 'activity':
+        
         # we need to handle activites here.
         # FIX ME
         pass
