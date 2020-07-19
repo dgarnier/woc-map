@@ -144,6 +144,59 @@
     }
 </script>
 <script>
+    function activities_layer() {
+        var popup_activites = L.popup();
+        var layer = L.geoJSON();
+
+        const colors = [
+            'green', 'red', 'brown', '#0000CC', 'magenta'
+        ];
+
+        function add_geojson(name) {
+            const urlbase = "{{ url_for('static', filename='routes') }}";
+            const url = `${urlbase}/${name}.geojson`
+            // return a promise
+            return $.ajax({
+                url: url,
+                timeout: 3000,
+                dataType: "json",
+                tryCount: 0,
+                retryLimit: 5,
+                success: function (json) {
+                    var gJ = L.geoJson(json).addTo(layer);
+                 /*   gJ.on('click', (e) => {
+                        popup_route
+                            .setLatLng(e.latlng)
+                            .setContent(
+                                `Click to download route.<br><b><a href="${urlbase}/${name}.tcx">${name}.tcx</a></b>`
+                                )
+                            .openOn(map);
+                        L.DomEvent.stopPropagation(e);
+                    });
+                  */
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    if (textStatus == 'timeout') {
+                        this.tryCount++;
+                        if (this.tryCount <= this.retryLimit) {
+                            //try again 
+                            return $.ajax(this);
+                        }
+                        return;
+                    }
+                    if (xhr.status == 500) { //handle error 
+                    } else { //handle error 
+                    }
+                }
+            });
+        }
+
+        add_geojson( "day1_raw" )
+
+        return layer;
+    }
+</script>
+<script>
     const colors = ['green', 'red', 'brown', '#0000CC', 'magenta'];
 
     function my_activities_layer() {
@@ -230,7 +283,11 @@
     routeLayer = get_routes_layer();
     routeLayer.addTo(map)
 
+    activitiesLayer = activities_layer();
+    activitiesLayer.addTo(map);
+
     var overlayMaps = {
+        "Raw Rides": activitiesLayer,
         "WOC BLM Routes": routeLayer,
     };
 
