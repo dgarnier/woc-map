@@ -5,6 +5,7 @@ from flask_login import login_required
 # from app.auth import auth.oauth
 import app.auth as auth
 import app.utils as utils
+import app.activities as activities
 from app.models import db, admin_required, Athlete, StravaEvent  # , Activity
 
 strava = Blueprint('strava', __name__)
@@ -176,10 +177,8 @@ def handle_strava_webhook_event(data):
     db.session.add(ev)
 
     if data['object_type'] == 'activity':
-        
-        # we need to handle activites here.
-        # FIX ME
-        pass
+        activities.process_event(ev, commit=False)
+ 
     elif data['object_type'] == 'athlete':
         oid = data.get('object_id')
         if oid:
