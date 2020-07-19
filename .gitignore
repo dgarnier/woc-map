@@ -10,3 +10,4 @@ secrets.py
 *.sqlite3
 flask_console.log
 node_modules
+event_save_log.csv
