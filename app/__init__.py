@@ -6,7 +6,8 @@ from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 
 from app.models import db
-from app.auth import oauth, auth
+#from app.auth import auth
+import app.auth as auth
 from app.main import main
 from app.api import api
 import app.strava as strava
@@ -38,8 +39,8 @@ def create_app(configuration='default'):
     migrate = Migrate()
     migrate.init_app(app, db)
 
-    oauth.init_app(app)
-    app.register_blueprint(auth)
+    auth.oauth.init_app(app)
+    app.register_blueprint(auth.auth)
 
     app.register_blueprint(main)
     app.register_blueprint(api, url_prefix='/api')

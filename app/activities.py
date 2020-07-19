@@ -5,7 +5,8 @@ from flask_login import login_required, current_user
 from app.models import (db, Athlete, Activity, get_or_create, 
                         Point, Tag, StravaEvent)
 from app.utils import hashtags
-from app.auth import oauth
+
+import app.auth as auth
 
 # some python to handle activities.
 
@@ -43,14 +44,16 @@ def process_event_id(event_id):
     return process_event(ev)
 
 
-def process_event(ev):
+def process_event(ev, commit=True):
     # process a single event from the event database
 
     if ev.object_type == 'activity' and ev.aspect_type == 'update':
         tags = hashtags(ev.updates)
         if tags.intersection(set(['wocblm', 'blmwoc', 'blm', 'woc'])):
             ev.timestamp = datetime.now()
-            save_activity(ev.object_id, ev.owner_id, timestamp=ev.event_time)
+            save_activity(ev.object_id, ev.owner_id, 
+                            timestamp=ev.event_time,
+                            commit=commit)
             return "Saved."
         else:
             current_app.logger.debug(f"Activity not WOC: {ev._id}")
@@ -60,7 +63,7 @@ def process_event(ev):
     return "Ignored."
 
 
-def save_activity(activity_id, owner_id, timestamp=None):
+def save_activity(activity_id, owner_id, timestamp=None, commit=True):
     # get the athlete auth_token so we can get the activity
 
     if timestamp:
@@ -80,8 +83,8 @@ def save_activity(activity_id, owner_id, timestamp=None):
 
     # params = {'include_all_efforts': False}
     params = None   # this returns less efforts
-    resp = oauth.strava.request('GET', f'activities/{activity_id}',
-                                token=auth_token, params=params)
+    resp = auth.oauth.strava.request('GET', f'activities/{activity_id}',
+                                     token=auth_token, params=params)
     if not resp.ok:
         current_app.logger.info(
             f'Activity: {activity_id}; failed to GET: {resp}')
@@ -127,7 +130,8 @@ def save_activity(activity_id, owner_id, timestamp=None):
         tag, _ = get_or_create(Tag, _id=hashtag)
         activity.tags.append(tag)
 
-    db.session.commit()
+    if commit:
+        db.session.commit()
 
     return activity
 
