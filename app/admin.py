@@ -3,7 +3,7 @@ from flask import (Blueprint, jsonify, request, current_app, url_for,
 from flask_login import current_user
 from flask_table import Table, Col, DatetimeCol
 from flask_wtf import FlaskForm
-# from flask_wtf.csrf import CSRFProtect
+#from flask_wtf.csrf import CSRFProtect
 from wtforms import IntegerField
 from wtforms.widgets import SubmitInput
 
