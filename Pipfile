@@ -16,6 +16,9 @@ blinker = "*"
 loginpass = "*"
 flask-table = "*"
 flask-wtf = "*"
+polyline = "*"
+geojson = "*"
+active-alchemy = "*"
 
 [requires]
 python_version = "3.7"
