@@ -202,14 +202,13 @@ def get_or_create(model, defaults=None, **kwargs):
     uses same as django.. returns if it had to create
     """
     try:
-        return db.session.query(model).filter_by(**kwargs).one(), False
+        return model.query.filter_by(**kwargs).one(), False
     except NoResultFound:
         if defaults is not None:
             kwargs.update(defaults)
         try:
-            with db.session.begin_nested():
-                instance = model(**kwargs)
-                db.session.add(instance)
-                return instance, True
+            instance = model(**kwargs)
+            db.session.add(instance)
+            return instance, True
         except IntegrityError:
             return db.session.query(model).filter_by(**kwargs).one(), False

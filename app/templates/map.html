@@ -51,9 +51,8 @@
 <script src="{{ url_for('static', filename='js/leaflet.restoreview.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap-notify.js') }}"></script>
 <script src="{{ url_for('static', filename='js/Leaflet.Control.Custom.js') }}"></script>
-
-<!-- 
 <script src="{{ url_for('static', filename='js/Polyline.encoded.js') }}"></script>
+<!-- 
 <script src="{{ url_for('static', filename='js/leaflet-messagebox.js') }}"></script>
 <script src="{{ url_for('static', filename='js/easy-button.js') }}"></script>
  -->
@@ -74,6 +73,126 @@
 {% endwith %}
 
 <script>
+    function get_routes_layer() {
+        var popup_route = L.popup();
+        var routeLayer = L.geoJSON();
+        const routes = [
+            '_B_lackLivesMatter',
+            'B_l_ackLivesMatter',
+            'Bl_a_ckLivesMatter',
+            'Bla_c_kLivesMatter',
+            'Blac_k_LivesMatter',
+            'Black_L_ivesMatter',
+            'BlackL_i_vesMatter',
+            'BlackLi_v_esMatter',
+            'BlackLiv_e_sMatter',
+            'BlackLive_s_Matter',
+            'BlackLives_M_atter',
+            'BlackLivesM_a_tter',
+            'BlackLivesMa_t_ter',
+            'BlackLivesMat_t_er',
+            'BlackLivesMatt_e_r',
+            'BlackLivesMatte_r_'
+        ];
+
+        const colors = [
+            'green', 'red', 'brown', '#0000CC', 'magenta'
+        ];
+        
+        function add_geojson(name, style) {
+            const urlbase = "{{ url_for('static', filename='routes') }}";
+            const url = `${urlbase}/${name}.geojson`
+            // return a promise
+            return $.ajax({
+                url: url,
+                timeout: 3000,
+                dataType: "json",
+                tryCount: 0,
+                retryLimit: 5,
+                success: function (json) {
+                    var gJ = L.geoJson(json, { style: style }).addTo(routeLayer);
+                    gJ.on('click', (e) => {
+                        popup_route
+                        .setLatLng(e.latlng)
+                        .setContent(`Click to download route.<br><b><a href="${urlbase}/${name}.tcx">${name}.tcx</a></b>`)
+                        .openOn(map);
+                        L.DomEvent.stopPropagation(e);
+                    });
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    if (textStatus == 'timeout') {
+                        this.tryCount++;
+                        if (this.tryCount <= this.retryLimit) {
+                            //try again 
+                            return $.ajax(this);
+                        } 
+                        return;
+                    } 
+                    if (xhr.status==500) { //handle error 
+                    } else { //handle error 
+                    } 
+                } 
+            }); 
+        } 
+        
+        var i; 
+        var len=routes.length; 
+        for (i=0; i < len; i++) {
+            add_geojson(routes[i], {color:colors[i % 5]} ); 
+        }
+        return routeLayer;
+    }
+</script>
+<script>
+    const colors = ['green', 'red', 'brown', '#0000CC', 'magenta'];
+
+    function my_activities_layer() {
+        const url = "{{ url_for('api.polylines') }}";
+        var layer = L.layerGroup();
+        var popup_polyline = L.popup()
+        $.ajax({
+            url: url,
+            timeout: 3000,
+            dataType: "json",
+            tryCount: 0,
+            retryLimit: 5,
+            success: function (polylines) {
+                console.log(`Got ${polylines.length} activities`);
+                for (var i=0; i < polylines.length; i++) {
+                    console.log(`Processing polyline #${i}`);
+                    console.log(L.PolylineUtil.decode(polylines[i].polyline));
+                    var pL = L.Polyline.fromEncoded(polylines[i].polyline, {color:colors[i % 5]});
+                    pL.addTo(layer);
+                    pL.on('click', (e) => {
+                        popup_polyline
+                            .setLatLng(e.latlng)
+                            .setContent(polylines[i].name)
+                            .openOn(layer);
+                        L.DomEvent.stopPropagation(e);
+                    });
+
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                if (textStatus == 'timeout') {
+                    this.tryCount++;
+                    if (this.tryCount <= this.retryLimit) {
+                        //try again
+                        return $.ajax(this); 
+                    } 
+                    return; 
+                } 
+                if (xhr.status==500){ 
+                    //handle error 
+                } else { 
+                    //handle error
+                } 
+            }
+        });
+        return layer;
+    }
+</script>
+<script>
     
     // add Stamen Watercolor to map.
     var stamen_wc = L.tileLayer.provider('Stamen.Watercolor');
@@ -92,86 +211,36 @@
             tileSize: 512,
             zoomOffset: -1
         });
-    
+
+    function inIframe () {
+        // safe in different broswers 
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    }
+
+        
     var map = L.map('mapid', { layers: [carto_VLU] });
     if (!map.restoreView()) { // maybe the user was looking somewhere
         map.setView([42.2, -71.88], 8);
     }
 
-    var popup_route = L.popup();
-    var routeLayer = L.geoJSON().addTo(map);
+    routeLayer = get_routes_layer();
+    routeLayer.addTo(map)
 
-    const routes = [
-        '_B_lackLivesMatter',
-        'B_l_ackLivesMatter',
-        'Bl_a_ckLivesMatter',
-        'Bla_c_kLivesMatter',
-        'Blac_k_LivesMatter',
-        'Black_L_ivesMatter',
-        'BlackL_i_vesMatter',
-        'BlackLi_v_esMatter',
-        'BlackLiv_e_sMatter',
-        'BlackLive_s_Matter',
-        'BlackLives_M_atter',
-        'BlackLivesM_a_tter',
-        'BlackLivesMa_t_ter',
-        'BlackLivesMat_t_er',
-        'BlackLivesMatt_e_r',
-        'BlackLivesMatte_r_'
-    ];
+    var overlayMaps = {
+        "WOC BLM Routes": routeLayer,
+    };
 
-    const colors = [
-        'green', 'red', 'brown', '#0000CC', 'magenta'       
-    ];
-
-    
-    function add_geojson(name, style) {
-        const urlbase = "{{ url_for('static', filename='routes') }}";
-        const url = `${urlbase}/${name}.geojson`
-        // return a promise
-        return $.ajax({
-            url: url,
-            timeout: 3000,
-            dataType: "json",
-            tryCount: 0,
-            retryLimit: 5,
-            success: function (json) {
-                var gJ = L.geoJson(json, { style: style }).addTo(routeLayer);
-                gJ.on('click', (e) => {
-                    popup_route
-                        .setLatLng(e.latlng)
-                        .setContent(`Click to download route.<br><b><a href="${urlbase}/${name}.tcx">${name}.tcx</a></b>`)
-                        .openOn(map);
-                    L.DomEvent.stopPropagation(e);
-                });
-
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                if (textStatus == 'timeout') {
-                    this.tryCount++;
-                    if (this.tryCount <= this.retryLimit) {
-                        //try again
-                        return $.ajax(this);
-                    }
-                    return;
-                }
-                if (xhr.status == 500) {
-                    //handle error
-                } else {
-                    //handle error
-                }
-            }
-        });
+    {% if not user_info.anonymous %}
+    if (inIframe() == false) {
+        my_activities = my_activities_layer();
+        my_activities.addTo(map);
+        overlayMaps["My Activites"] = my_activities;
     }
-
-    var i;
-    var len = routes.length;
-    for (i=0; i < len; i++) {
-        add_geojson(routes[i], {color:colors[i % 5]} );
-    }
-
-    //L.polyline(polly, {color:'blue'}).addTo(map);
-    //L.poline(polly)
+    {% endif %}
 
     // Set up layers control
     var baseMaps = {
@@ -183,10 +252,6 @@
         'Stadia.AlidadeSmooth'       : stadia_alidade,   
         'Stadia.AlidadeSmoothDark'   : stadia_alidade_dark,
         'MapBox OSM': osm_mapbox
-    };
-
-    var overlayMaps = {
-        "WOC BLM Routes": routeLayer
     };
 
     layer_control = L.control.layers(baseMaps, overlayMaps, { collapsed: true });
@@ -212,85 +277,43 @@
 
     {% if user_info.anonymous %}
 
-    /*
-    avatar = L.easyButton(
-        "{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}",
-        function(btn, map) {
-             window.location = "{{ url_for('loginpass.login', name='strava') }}";
-        },
-        "Login or Authorize with STRAVA"
-    );
-    */
-
-    avatar = L.control.custom({
-        position: 'bottomright',
-        content: '<button id="strava_btn">' + 
-            '<img id="strava_img" src="{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}">' +
-            '</button>',
-        style: {
-//            margin: {0, 0, 0, 0}
-        },
-        events: {
-            click: function(data) {
-                window.location.href = "{{ url_for('loginpass.login', name='strava') }}";
+        avatar = L.control.custom({
+            position: 'bottomright',
+            content: '<button id="strava_btn">' + 
+                '<img id="strava_img" src="{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}">' +
+                '</button>',
+            style: {
+    //            margin: {0, 0, 0, 0}
             },
-        }
-    });
-    /*
-    L.Control.Avatar = L.Control.extend({
-        container: null,
-        onAdd: function (map) {
-            this.container = L.DomUtil.create('div');
-            var img = L.DomUtil.create('img');
-            img.src = "{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}";
-            //img.style.borderRadius = '50%';
-            //img.style.height = '70px';
-            $('#img').on('click', (e) => {
-                 window.location = "{{ url_for('loginpass.login', name='strava') }}";
-            });
-            return img;
-        },
-
-        onRemove: function (map) {
-        // Nothing to do here
-        }
-    });
+            events: {
+                click: function(data) {
+                    window.location.href = "{{ url_for('loginpass.login', name='strava') }}";
+                },
+            }
+        });
     
-    avatar = new L.Control.Avatar({ position: 'bottomright' });
-    */
-
     {% else %}
-    
-    L.Control.Avatar = L.Control.extend({
-        onAdd: function (map) {
-            var img = L.DomUtil.create('img');
-            img.src = "{{ user_info.profile_medium|safe }}";
-            img.style.borderRadius = '50%';
-            img.style.height = '70px';
-            return img;
-        },
+        
+        L.Control.Avatar = L.Control.extend({
+            onAdd: function (map) {
+                var img = L.DomUtil.create('img');
+                img.src = "{{ user_info.profile_medium|safe }}";
+                img.style.borderRadius = '50%';
+                img.style.height = '70px';
+                return img;
+            },
 
-        onRemove: function (map) {
-            // Nothing to do here
+            onRemove: function (map) {
+                // Nothing to do here
+            }
+        });
+
+        L.control.avatar = function (opts) {
+            return new L.Control.Avatar(opts);
         }
-    });
-
-    L.control.avatar = function (opts) {
-        return new L.Control.Avatar(opts);
-    }
-    avatar = L.control.avatar({ position: 'bottomright' });
+        avatar = L.control.avatar({ position: 'bottomright' });
 
     {% endif %}
-
-
-    function inIframe () {
-        // safe in different broswers 
-        try {
-            return window.self !== window.top;
-        } catch (e) {
-            return true;
-        }
-    }
 
     if (inIframe() == false) {
         // not in an iframe

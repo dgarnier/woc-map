@@ -3,10 +3,12 @@ import click
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from flask_wtf.csrf import CSRFProtect
 
 from app.models import db
 from app.auth import oauth, auth
 from app.main import main
+from app.api import api
 import app.strava as strava
 import app.admin as admin
 
@@ -28,6 +30,9 @@ def create_app(configuration='default'):
     login_manager = LoginManager()
     login_manager.init_app(app)
 
+    csrf = CSRFProtect()
+    csrf.init_app(app)
+
     db.init_app(app)
 
     migrate = Migrate()
@@ -37,6 +42,7 @@ def create_app(configuration='default'):
     app.register_blueprint(auth)
 
     app.register_blueprint(main)
+    app.register_blueprint(api, url_prefix='/api')
 
     app.register_blueprint(strava.strava, url_prefix='/strava')
     app.register_blueprint(admin.admin, url_prefix='/admin')
