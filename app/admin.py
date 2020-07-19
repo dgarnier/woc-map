@@ -35,7 +35,7 @@ def fetch_activity(activity_id):
 
 
 @admin.route('/check_event/<int:event_id>')
-# @admin_required
+@admin_required
 def check_event(event_id):
     if not event_id:
         abort(404)

@@ -7,6 +7,7 @@ from app.models import (db, Athlete, Activity, get_or_create,
 from app.utils import hashtags
 
 import app.auth as auth
+from authlib.integrations.base_client import InvalidTokenError
 
 # some python to handle activities.
 
@@ -51,9 +52,11 @@ def process_event(ev, commit=True):
         tags = hashtags(ev.updates)
         if tags.intersection(set(['wocblm', 'blmwoc', 'blm', 'woc'])):
             ev.timestamp = datetime.now()
-            save_activity(ev.object_id, ev.owner_id, 
+            ret = save_activity(ev.object_id, ev.owner_id, 
                             timestamp=ev.event_time,
                             commit=commit)
+            if ret is None:
+                return "Didn't save."
             return "Saved."
         else:
             current_app.logger.debug(f"Activity not WOC: {ev._id}")
@@ -83,8 +86,14 @@ def save_activity(activity_id, owner_id, timestamp=None, commit=True):
 
     # params = {'include_all_efforts': False}
     params = None   # this returns less efforts
-    resp = auth.oauth.strava.request('GET', f'activities/{activity_id}',
-                                     token=auth_token, params=params)
+    try:
+        resp = auth.oauth.strava.request('GET', f'activities/{activity_id}',
+                                        token=auth_token, params=params)
+    except InvalidTokenError:
+        current_app.logger.info(
+            f'Activity: {activity_id}; failed to GET: InvalidTokenError!')
+        return
+
     if not resp.ok:
         current_app.logger.info(
             f'Activity: {activity_id}; failed to GET: {resp}')
