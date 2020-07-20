@@ -3,7 +3,7 @@ import click
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_migrate import Migrate
-#from flask_wtf.csrf import CSRFProtect
+# from flask_wtf.csrf import CSRFProtect
 
 from app.models import db
 #from app.auth import auth
