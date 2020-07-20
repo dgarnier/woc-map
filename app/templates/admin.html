@@ -62,8 +62,9 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- 
 <script type="text/javascript">
-    var csrf_token = "{{ csrf_token() }}";
+{#    var csrf_token = "{{ csrf_token() }}";   #}
 
     $.ajaxSetup({
         beforeSend: function (xhr, settings) {
@@ -73,7 +74,7 @@
         }
     });
 </script>
-
+ -->
 {% endblock %}
 
 {% block content %}
