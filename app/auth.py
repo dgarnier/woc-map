@@ -52,7 +52,7 @@ def strava_update_token(token, refresh_token=None, access_token=None):
         else:
             current_app.logger.info(f'Token refreshed for: {ath}')
             ath.auth_token = token
-        db.session.commit()
+        db.session.flush()
 
 
 def handle_authorize(remote, token, user_info):

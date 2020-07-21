@@ -8,6 +8,7 @@ from wtforms import IntegerField
 from wtforms.widgets import SubmitInput
 
 import sqlalchemy as sa
+from sqlalchemy.sql import func, distinct
 
 # from app.auth import auth.oauth
 # import app.auth as auth
@@ -98,6 +99,18 @@ def index():
     stats['wocblm_updates'] = db.session.query(StravaEvent.updates).\
         filter(StravaEvent.updates.match('#WOCBLM')).count()
     stats['saved activities'] = db.session.query(Activity._id).count()
+
+    q = db.session.query(func.sum(Activity.moving_time).label("total_moving_time"),
+                         func.sum(Activity.distance).label("total_distance"),
+                         func.count(distinct(Activity.athlete_id)).label("distinct athletes")
+                         )
+    result = q.first() 
+
+    current_app.logger.info(f'{result}')
+    stats['atheletes contributing'] = result[2]
+    stats['moving time (hours)'] = "{:.1f}".format( int(result[0])/3600 )
+    stats['total distance (km)'] = "{:.1f}".format( int(result[1])/1000 )
+    stats['total distance (miles)'] = "{:.1f}".format( int(result[1])/1609.34)
 
 
 

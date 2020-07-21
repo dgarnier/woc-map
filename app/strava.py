@@ -112,7 +112,7 @@ def check_current_subscription():
     }
     resp = auth.oauth.strava.request(
         'GET', STRAVA_SUBSCRIBE_URL, withhold_token=True, params=params)
-    
+
     if resp.ok and resp.json():
         # only one allowed
         return resp.json()[0]
@@ -166,19 +166,21 @@ def handle_strava_webhook_event(data):
     """
     current_app.logger.debug(f'StravaEvent {data}')
 
-    # ignore certain events
-    if 'update' not in data.get('aspect_type'):
-        return
 
     # convert to string
     updates = data.get('updates')
     data['updates'] = str(updates)
     ev = StravaEvent(**data)
     db.session.add(ev)
+    db.session.flush()
+
+    # ignore certain events
+    if 'update' not in data.get('aspect_type'):
+        return
 
     if data['object_type'] == 'activity':
         activities.process_event(ev, commit=False)
- 
+
     elif data['object_type'] == 'athlete':
         oid = data.get('object_id')
         if oid:
@@ -186,8 +188,6 @@ def handle_strava_webhook_event(data):
             current_app.logger.info(f"Athlete {oid}: {data['updates']}")
             athlete = Athlete.query.get(oid)
             athlete.deauthorize()
-
-    db.session.commit()
 
 
 # handle strava webhooks subscriptions
@@ -211,7 +211,7 @@ def webhook():
     # this is a real strava event
     data = request.get_json()
     handle_strava_webhook_event(data)
-
+    db.session.commit()
     return '', 200
 
 
