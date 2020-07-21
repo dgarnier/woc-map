@@ -22,12 +22,28 @@
             height: 100%;
         }
 
+
         .leaflet-control-layers-list {
             text-align: left;
         }
-        .avatar-circled {
+        .avatar-circled img {
             clip-path: circle(70px at center);
         }
+
+        .avatar-circled img {
+            border-radius: 50%;
+
+        }
+
+        .leaflet-popup-content-wrapper .leaflet-popup-content img {
+            border-radius: 50%;
+            width: 75px;
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 50%;
+        }
+
         #mapid {
         height: 100%;
         width: 100%;
@@ -145,12 +161,17 @@
 </script>
 <script>
     function activities_layer() {
-        var popup_activites = L.popup();
+        var popup_activities = L.popup();
         var layer = L.geoJSON();
 
         const colors = [
             'green', 'red', 'brown', '#0000CC', 'magenta'
         ];
+
+        const rainbow_pallet = [
+            '#EE82EE', '#0000FF', '#008000', '#FFFF00',
+            '#FFA500', '#FF0000'
+        ]
 
         function add_geojson(name) {
             const urlbase = "{{ url_for('static', filename='routes') }}";
@@ -163,17 +184,24 @@
                 tryCount: 0,
                 retryLimit: 5,
                 success: function (json) {
-                    var gJ = L.geoJson(json).addTo(layer);
-                 /*   gJ.on('click', (e) => {
-                        popup_route
-                            .setLatLng(e.latlng)
-                            .setContent(
-                                `Click to download route.<br><b><a href="${urlbase}/${name}.tcx">${name}.tcx</a></b>`
-                                )
-                            .openOn(map);
-                        L.DomEvent.stopPropagation(e);
-                    });
-                  */
+                    var gJ = L.geoJson(json, {
+                            style: (activity) => {
+                                return {'color': colors[activity.properties.id % colors.length]}
+                            },
+                            onEachFeature: (activity, layr) => {
+                                layr.on('click', (e) => {
+                                    popup_activities
+                                        .setLatLng(e.latlng)
+                                        .setContent(
+                                            `<img src="${activity.properties.avatar}"` +
+                                            'class="avatar-circled">'
+                                        )
+                                        .openOn(map);
+                                    L.DomEvent.stopPropagation(e);
+                                })
+                            }
+                        }
+                    ).addTo(layer);
                 },
                 error: function (xhr, textStatus, errorThrown) {
                     if (textStatus == 'timeout') {
@@ -191,7 +219,7 @@
             });
         }
 
-        add_geojson( "day1_raw" )
+        add_geojson( "activities_raw" )
 
         return layer;
     }
@@ -281,7 +309,7 @@
     }
 
     routeLayer = get_routes_layer();
-    routeLayer.addTo(map)
+    // routeLayer.addTo(map)
 
     activitiesLayer = activities_layer();
     activitiesLayer.addTo(map);

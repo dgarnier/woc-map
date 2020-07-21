@@ -12,7 +12,8 @@ db = ActiveAlchemy('mysql+pymysql://' +
 
 '''
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, relationship, backref, composite
+from sqlalchemy.orm import (sessionmaker, relationship, backref, composite, 
+                            joinedload, lazyload)
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy as db
 
@@ -207,16 +208,34 @@ def activities_to_geojson():
 
     i = 0
     featurelist = []
-    activities = session.query(Activity.name, Activity.map_summary_polyline)
+    activities = session.query(Activity)
+    activities = activities.options(joinedload(Activity.athlete))
     for activity in activities:
         # act_id = activity._id
         # ath_id = activity.athlete_id
+        # could put in the bounding box (sw to ne) ("bbox": [west, sout, east, north])
+
+        msp = activity.map_summary_polyline or activity.map_polyline
+        if not msp:
+            continue
+        coords = polyline.decode(msp)
+        north, east = coords[0]
+        south, west = coords[0]
+        for coord in coords:
+            north = coord[0] if coord[0] > north else north
+            south = coord[0] if coord[0] < south else south
+            east = coord[1] if coord[1] > east else east
+            west = coord[1] if coord[1] < west else west
+
         props = {
                  'name': activity.name,
-                 'style': {'color': colors[i % 5]}
+                 'avatar': activity.athlete.profile_medium,
+                 'id': activity._id,
+                 'bbox': [west, south, east, north],
+                 'start_date': activity.start_date.timestamp(),
                 }
-        coords = polyline.decode(activity.map_summary_polyline)
-        coorflip = [[lg,lt] for lt,lg in coords]
+
+        coorflip = [[lg, lt] for lt, lg in coords]
         geo_ls = geojson.LineString(coorflip)
         feature = geojson.Feature(geometry=geo_ls, properties=props)
         featurelist.append(feature)
