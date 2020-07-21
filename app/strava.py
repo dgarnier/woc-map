@@ -165,9 +165,7 @@ def handle_strava_webhook_event(data):
         save the activity
     """
     current_app.logger.debug(f'StravaEvent {data}')
-
-
-    # convert to string
+    # convert to string.. FIX DATABASE HERE
     updates = data.get('updates')
     data['updates'] = str(updates)
     ev = StravaEvent(**data)

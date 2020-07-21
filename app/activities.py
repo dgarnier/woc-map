@@ -74,6 +74,42 @@ def process_event(ev, commit=True):
     return "Ignored."
 
 
+def check_athlete(athlete, before=None, after=None, page=None, per_page=None):
+
+    params = {}
+    if before:
+        params['before'] = before
+    if after:
+        params['after'] = after
+    if page:
+        params['page'] = page
+    if per_page:
+        params['per_page'] = per_page
+
+    if isinstance(athlete, int):
+        athlete = db.session.query(Athlete).get(athlete)
+
+    auth_token = athlete.auth_token
+
+    try:
+        resp = auth.oauth.strava.request('GET', f'athlete/activities',
+                                         token=auth_token, params=params)
+    except InvalidTokenError:
+        current_app.logger.info(
+            f'Activity: {activity_id}; failed to GET: InvalidTokenError!')
+        return "Invalid token."
+
+    if not resp.ok:
+        current_app.logger.info(
+            f'Athlete: {athlete._id}; failed to get activities: {resp}')
+        return "Invalid response from STRAVA"
+
+    activity_summaries = resp.json()
+
+    for summary in activity_summaries:
+        pass
+
+
 def save_activity(activity_id, owner_id, timestamp=None, commit=True,
                   filter_for_tags=True):
     # get the athlete auth_token so we can get the activity

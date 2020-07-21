@@ -6,7 +6,7 @@ from flask_migrate import Migrate
 # from flask_wtf.csrf import CSRFProtect
 
 from app.models import db
-#from app.auth import auth
+# from app.auth import auth
 import app.auth as auth
 from app.main import main
 from app.api import api
