@@ -1,9 +1,9 @@
 from flask import (Blueprint, jsonify, request, current_app, url_for,
-                   render_template, send_file, redirect, flash, abort)
+                   render_template, redirect, abort)
 from flask_login import current_user
 from flask_table import Table, Col, DatetimeCol
 from flask_wtf import FlaskForm
-#from flask_wtf.csrf import CSRFProtect
+# from flask_wtf.csrf import CSRFProtect
 from wtforms import IntegerField
 from wtforms.widgets import SubmitInput
 
@@ -43,9 +43,6 @@ def check_event(event_id):
     return process_event_id(int(event_id))
 
 
-'''
-broken!
-'''
 @admin.route('/check_events')
 @admin_required
 def check_events():
@@ -100,19 +97,20 @@ def index():
         filter(StravaEvent.updates.match('#WOCBLM')).count()
     stats['saved activities'] = db.session.query(Activity._id).count()
 
-    q = db.session.query(func.sum(Activity.moving_time).label("total_moving_time"),
-                         func.sum(Activity.distance).label("total_distance"),
-                         func.count(distinct(Activity.athlete_id)).label("distinct athletes")
+    q = db.session.query(func.sum(Activity.moving_time)
+                         .label("total_moving_time"),
+                         func.sum(Activity.distance)
+                         .label("total_distance"),
+                         func.count(distinct(Activity.athlete_id))
+                         .label("distinct athletes")
                          )
-    result = q.first() 
+    result = q.first()
 
     current_app.logger.info(f'{result}')
-    stats['atheletes contributing'] = result[2]
-    stats['moving time (hours)'] = "{:.1f}".format( int(result[0])/3600 )
-    stats['total distance (km)'] = "{:.1f}".format( int(result[1])/1000 )
-    stats['total distance (miles)'] = "{:.1f}".format( int(result[1])/1609.34)
-
-
+    stats['athletes contributing'] = result[2]
+    stats['moving time (hours)'] = "{:.1f}".format(int(result[0])/3600)
+    stats['total distance (km)'] = "{:.1f}".format(int(result[1])/1000)
+    stats['total distance (miles)'] = "{:.1f}".format(int(result[1])/1609.34)
 
     incomplete = Athlete.query.filter(Athlete.auth_granted == 0)
     incomplete_table = AthleteTable(incomplete)

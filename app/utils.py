@@ -23,5 +23,5 @@ def cvsfileify(dict_list, keys, filename):
 def hashtags(line):
     if not line:
         line = ""
-    tags = re.split('[ :!\'"&\?\t\n]', line.lower())
+    tags = re.split('[ :!.,\'"&\\?\t\n]', line.lower())
     return set([i[1:] for i in tags if i.startswith("#")])
