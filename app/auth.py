@@ -40,7 +40,7 @@ def strava_update_token(token, refresh_token=None, access_token=None):
         else:
             return
 
-        current_app.logger.debug(f'update token: {token}')
+        # current_app.logger.debug(f'update token: {token}')
         if ath is None:
             current_app.logger.warn(f'Got access token without owner: {token}')
             return

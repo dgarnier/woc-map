@@ -6,12 +6,19 @@ from app.models import (db, Athlete, Activity, get_or_create,
 from app.utils import hashtags
 
 import app.auth as auth
-from authlib.integrations.base_client import InvalidTokenError
+from authlib.integrations.base_client import (InvalidTokenError,
+                                              UnsupportedTokenTypeError)
 
 # some python to handle activities.
 
+# these are the drones we are looking for
+woctags = set(['wocblm', 'blmwoc', 'blm', 'woc'])
+
 
 def process_range(first=None, last=None, max_events=100):
+    # process a range of events.
+    # works well as long as no one "commits"
+    # but it's ok.. we can "flush" after an event
 
     events = StravaEvent.query
     if first:
@@ -48,7 +55,7 @@ def process_event(ev, commit=True):
 
     if ev.object_type == 'activity' and ev.aspect_type == 'update':
         tags = hashtags(ev.updates)
-        if tags.intersection(set(['wocblm', 'blmwoc', 'blm', 'woc'])):
+        if tags.intersection(woctags):
             ev.timestamp = datetime.now()
             ret = save_activity(ev.object_id, ev.owner_id,
                                 timestamp=ev.event_time,
@@ -74,17 +81,28 @@ def process_event(ev, commit=True):
     return "Ignored."
 
 
-def check_athlete(athlete, before=None, after=None, page=None, per_page=None):
+def process_athletes(page=1, before=None, after=None, per_page=100):
+    try:
+        athletes = db.session.query(Athlete).paginate(page=int(page), per_page=int(per_page))
+    except (TypeError, ValueError):
+        return 'Error', 400
+    for athlete in athletes.items:
+        check_athlete(athlete,  before=before, after=after)
+    db.session.commit()
+    return 'Done'
+
+
+def check_athlete(athlete, before=None, after=None):
 
     params = {}
     if before:
         params['before'] = before
     if after:
         params['after'] = after
-    if page:
-        params['page'] = page
-    if per_page:
-        params['per_page'] = per_page
+    # if page:
+    #    params['page'] = page
+    # if per_page:
+    #    params['per_page'] = per_page
 
     if isinstance(athlete, int):
         athlete = db.session.query(Athlete).get(athlete)
@@ -92,25 +110,31 @@ def check_athlete(athlete, before=None, after=None, page=None, per_page=None):
     auth_token = athlete.auth_token
 
     try:
-        resp = auth.oauth.strava.request('GET', f'athlete/activities',
+        resp = auth.oauth.strava.request('GET', 'athlete/activities',
                                          token=auth_token, params=params)
-    except InvalidTokenError:
+    except (UnsupportedTokenTypeError, InvalidTokenError):
         current_app.logger.info(
-            f'Activity: {activity_id}; failed to GET: InvalidTokenError!')
+            f'Failed to get Athlete activities for {athlete}:'
+            ' Invalid or Revoked Token')
         return "Invalid token."
 
     if not resp.ok:
         current_app.logger.info(
-            f'Athlete: {athlete._id}; failed to get activities: {resp}')
+            f'Athlete: {athlete}; failed to get activities: {resp}')
         return "Invalid response from STRAVA"
 
     activity_summaries = resp.json()
 
     for summary in activity_summaries:
-        pass
+        tags = (hashtags(summary['name'])
+                .union(hashtags(summary.get('description'))))
+        if tags.intersection(woctags):
+            if not Activity.query.get(summary['id']):
+                save_activity(summary['id'], athlete, commit=False,
+                              filter_for_tags=False)
 
 
-def save_activity(activity_id, owner_id, timestamp=None, commit=True,
+def save_activity(activity_id, owner, timestamp=None, commit=True,
                   filter_for_tags=True):
     # get the athlete auth_token so we can get the activity
 
@@ -122,11 +146,15 @@ def save_activity(activity_id, owner_id, timestamp=None, commit=True,
             # already updated
             return "Already saved."
 
-    athlete = Athlete.query.get(int(owner_id))
+    if isinstance(owner, int):
+        athlete = db.session.query(Athlete).get(owner)
+    else:
+        athlete = owner
+
     auth_token = athlete.auth_token if athlete else None
     if not auth_token:
         current_app.logger.info(
-            f'Activity: {activity_id}; no auth for {owner_id}: {athlete}')
+            f'Activity: {activity_id}; no auth for {athlete._id}: {athlete}')
         return "No auth token."
 
     # params = {'include_all_efforts': False}
@@ -152,7 +180,7 @@ def save_activity(activity_id, owner_id, timestamp=None, commit=True,
 
     if filter_for_tags:
         tags = hashtags(data['name']).union(hashtags(data.get('description')))
-        if not tags.intersection(set(['wocblm', 'blmwoc', 'blm', 'woc'])):
+        if not tags.intersection(woctags):
             current_app.logger.info(f'Activity: {activity_id}; '
                                     f'had no matching hashtag: {data["name"]}')
             return "Not a WOC activity."
