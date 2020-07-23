@@ -400,11 +400,12 @@
 
     {% endif %}
 
+    stravamark.addTo(map);
+
     if (inIframe() == false) {
         // not in an iframe
         layer_control.addTo(map);
         {% if not user_info.anonymous %}
-        stravamark.addTo(map);
         {% endif %}
         avatar.addTo(map);
         //console.log('not in iFrame');

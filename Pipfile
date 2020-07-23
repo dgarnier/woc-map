@@ -1,6 +1,6 @@
 [dev-packages]
 autopep8 = "*"
-awsebcli = "*"
+matplotlib = "*"
 
 [packages]
 pymysql = "*"
@@ -18,7 +18,10 @@ flask-table = "*"
 flask-wtf = "*"
 polyline = "*"
 geojson = "*"
-active-alchemy = "*"
+numpy = "*"
+numba = "*"
+scipy = "*"
+awsebcli = "*"
 
 [requires]
 python_version = "3.7"

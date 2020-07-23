@@ -136,6 +136,9 @@ class Tag(db.Model):
     activities = db.relationship('Activity',
                                  secondary=act_tag_assoc_table)
 
+    def __str__(self):
+        return self._id
+
 
 class Activity(db.Model):
     _id = db.Column(db.BigInteger, primary_key=True)

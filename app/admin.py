@@ -9,11 +9,13 @@ from wtforms.widgets import SubmitInput
 
 import sqlalchemy as sa
 from sqlalchemy.sql import func, distinct
+from sqlalchemy.orm import joinedload
 
 # from app.auth import auth.oauth
 # import app.auth as auth
 import app.utils as utils
-from app.activities import save_activity, process_event_id, process_range
+from app.activities import (save_activity, process_event_id, process_range,
+                            process_athletes)
 from app.models import db, admin_required, Athlete, StravaEvent, Activity
 
 admin = Blueprint('admin', __name__)
@@ -49,10 +51,16 @@ def check_events():
     prange = process_range(**request.args)
     return jsonify(prange)
 
+@admin.route('/check_athletes')
+@admin_required
+def check_athletes():
+    return process_athletes(**request.args)
+
 
 @admin.route('/athletes')
 @admin_required
 def athletes():
+    
     athletes = Athlete.query.all()
     athlete_dicts = dict_gen(athletes)
     ext = request.args.get('ext')
@@ -61,9 +69,52 @@ def athletes():
         keys = ['_id', 'firstname', 'lastname', 'city', 'state', 'country',
                 'auth_granted', 'club_member', 'club_admin', 'waiver_verified']
 
-        return utils.cvsfileify(athlete_dicts, keys, 'athletes'+ext)
+        return utils.cvsfileify(athlete_dicts, keys, 'athletes')
     else:
         return jsonify(list(athlete_dicts))
+
+
+@admin.route('/activities')
+@admin_required
+def activities():
+    # need to limit this
+    activities = (db.session.query(Activity)
+                  .options(joinedload(Activity.athlete))
+                  .order_by(Activity.athlete_id)
+                  )
+
+    keys = ['Activity',
+            'Type',
+            'Start Date',
+            'Athlete ID',
+            'First Name',
+            'Last Name',
+            'Hashtag',
+            'Title'
+            ]
+
+    def activity_dict_gen(activities):
+        for activity in activities:
+            row = {
+                'Activity': activity._id,
+                'Type': activity.activity_type,
+                'Start Date': activity.start_date.timestamp(),
+                'Athlete ID': activity.athlete_id,
+                'First Name': activity.athlete.firstname,
+                'Last Name': activity.athlete.lastname,
+                'Hashtags': " ".join([tag for tag in activity.tags]),
+                'Title': activity.name
+            }
+            yield row
+
+    activity_dicts = activity_dict_gen(activities)
+
+    ext = request.args.get('ext')
+
+    if ext and ext.lower() in ['csv', 'txt']:
+        return utils.cvsfileify(activity_dicts, keys, 'activities')
+    else:
+        return jsonify(list(activity_dicts))
 
 
 class AthleteTable(Table):
