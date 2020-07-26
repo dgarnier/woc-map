@@ -3,17 +3,26 @@ from datetime import datetime
 from flask import current_app
 from flask_login import UserMixin, current_user
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 
 class SQLA(SQLAlchemy):
     def init_app(self, app):
+        self.in_app = True
         super(SQLA, self).init_app(app)
 
         @app.login_manager.user_loader
         def load_user(user_id):
             return Athlete.query.get(int(user_id))
+
+    # this is untested.. might work?
+    def init_outside_app(self, database_uri):
+        self.in_app = False
+        self.engine = create_engine(database_uri)
+        self.session = Session(self.engine)
 
 
 db = SQLA()
@@ -134,10 +143,31 @@ act_tag_assoc_table = db.Table('act_tag_assoc', db.Model.metadata,
 class Tag(db.Model):
     _id = db.Column(db.String(32), primary_key=True)
     activities = db.relationship('Activity',
-                                 secondary=act_tag_assoc_table)
+                                 secondary=act_tag_assoc_table,
+                                 back_populates='tags')
 
     def __str__(self):
-        return self._id
+        return f'#{self._id.upper()}'
+
+
+def compare_dicts_with_ndarrays(dict_a, dict_b):
+    import numpy as np
+    if isinstance(dict_a, dict) and isinstance(dict_b, dict):
+        if dict_a.keys() != dict_b.keys():
+            return False
+        for key in dict_a.keys():
+            try:
+                if dict_a[key] != dict_b[key]:
+                    return False
+            except ValueError as e:
+                try:
+                    if not np.array_equal(dict_a[key], dict_b[key]):
+                        return False
+                except:
+                    return False
+        return True
+    else:
+        return dict_a == dict_b
 
 
 class Activity(db.Model):
@@ -146,7 +176,8 @@ class Activity(db.Model):
                            nullable=False)
     athlete = db.relationship('Athlete',
                               backref=db.backref('activities', lazy=True))
-    tags = db.relationship('Tag', secondary=act_tag_assoc_table)
+    tags = db.relationship('Tag', secondary=act_tag_assoc_table,
+                           back_populates='activities')
     name = db.Column(db.Text())
     description = db.Column(db.Text, nullable=True)
     # tags = db.Column(db.String)
@@ -171,6 +202,9 @@ class Activity(db.Model):
     flagged = db.Column(db.Boolean)
     details = db.Column(db.JSON, nullable=True)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
+    on_course = db.Column(db.Integer)
+    analysis = db.Column(db.PickleType(
+        comparator=compare_dicts_with_ndarrays))
 
 
 class Route(db.Model):

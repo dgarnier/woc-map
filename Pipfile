@@ -19,9 +19,11 @@ flask-wtf = "*"
 polyline = "*"
 geojson = "*"
 numpy = "*"
-numba = "*"
 scipy = "*"
 awsebcli = "*"
+virtualenvwrapper = "*"
+geobuf = "*"
+rdp = "*"
 
 [requires]
 python_version = "3.7"

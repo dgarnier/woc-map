@@ -365,7 +365,8 @@
         avatar = L.control.custom({
             position: 'bottomright',
             content: '<button id="strava_btn">' + 
-                '<img id="strava_img" src="{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}">' +
+                '<img id="strava_img" src=' +
+                '"{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}">' +
                 '</button>',
             style: {
     //            margin: {0, 0, 0, 0}

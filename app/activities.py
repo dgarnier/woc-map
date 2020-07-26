@@ -1,11 +1,16 @@
 from datetime import datetime
 from flask import current_app
 
+import geojson
+# import geobuf
+
+from sqlalchemy.orm import joinedload
 from app.models import (db, Athlete, Activity, get_or_create,
                         Point, Tag, StravaEvent)
 from app.utils import hashtags
 
 import app.auth as auth
+import app.analysis as analysis
 from authlib.integrations.base_client import (InvalidTokenError,
                                               UnsupportedTokenTypeError)
 
@@ -83,16 +88,17 @@ def process_event(ev, commit=True):
 
 def process_athletes(page=1, before=None, after=None, per_page=100):
     try:
-        athletes = db.session.query(Athlete).paginate(page=int(page), per_page=int(per_page))
+        athletes = db.session.query(Athlete).paginate(page=int(page),
+                                                      per_page=int(per_page))
     except (TypeError, ValueError):
         return 'Error', 400
     for athlete in athletes.items:
-        check_athlete(athlete,  before=before, after=after)
+        process_athlete(athlete,  before=before, after=after)
     db.session.commit()
     return 'Done'
 
 
-def check_athlete(athlete, before=None, after=None):
+def process_athlete(athlete, before=None, after=None):
 
     params = {}
     if before:
@@ -132,6 +138,8 @@ def check_athlete(athlete, before=None, after=None):
             if not Activity.query.get(summary['id']):
                 save_activity(summary['id'], athlete, commit=False,
                               filter_for_tags=False)
+
+    return 'Done'
 
 
 def save_activity(activity_id, owner, timestamp=None, commit=True,
@@ -228,3 +236,150 @@ def save_activity(activity_id, owner, timestamp=None, commit=True,
         db.session.flush()
 
     return activity
+
+
+gRoutes = None
+
+
+def analyze_activity(activity):
+    import polyline
+    import numpy as np
+    global gRoutes
+    if not gRoutes:
+        gRoutes = analysis.read_routes_numpy()
+
+    if isinstance(activity, int):
+        activity = Activity.query.get(activity)
+
+    pl = activity.map_polyline
+    if not pl:
+        pl = activity.map_summary_polyline
+    if not pl:
+        return
+
+    pts = np.array(polyline.decode(activity.map_polyline))[:, (1, 0)]
+
+    current_app.logger.info(f'Analysing {activity}')
+    d2r, rtnums, deltas = analysis.activity_first_pass(pts, gRoutes)
+    segs, on_route = analysis.activity_segment(pts, rtnums, d2r, deltas)
+    on_route = int(on_route)
+
+    results = {
+        'coordinates': pts,
+        'route_nums': rtnums,
+        'dist_to_rtes': d2r,
+        'deltas': deltas,
+        'segments': segs
+        }
+
+    current_app.logger.info(f'{activity}: {on_route/1000.} of '
+                            f'{activity.distance/1000.} (km) on route.')
+
+    activity.on_course = int(on_route)
+    activity.analysis = results
+    db.session.flush()
+
+
+def analyze_activities(page=1, before=None, after=None, per_page=100):
+    try:
+        activities = db.session.query(Activity).paginate(
+            page=int(page), per_page=int(per_page))
+    except (TypeError, ValueError):
+        return 'Error', 400
+    for activity in activities.items:
+        analyze_activity(activity)
+
+    db.session.commit()
+    return 'Done'
+
+
+def activity_to_geojson_features(activity, collect=True):
+    import numpy as np
+    from rdp import rdp
+
+    # global gRoutes
+    # if not gRoutes:
+    #     gRoutes = analysis.read_routes_numpy()
+    rt_names = analysis.route_names()
+
+    if isinstance(activity, int):
+        activity = (Activity.query
+                    .options(joinedload(Activity.athlete))
+                    .get(activity))
+
+    if not (activity and activity.analysis):
+        return []
+
+    segments = activity.analysis['segments']
+    rts = set([s['route_num'] for s in segments if s['route_num'] > 0] + [0])
+    pls = {rt: {'distance': 0, 'polystring': []} for rt in rts}
+    for s in activity.analysis.get('segments'):
+        # Ramer-Douglas-Peucker reduction (epsilon=?) roughly 30m
+        pts = rdp(s['coordinates'], epsilon=.0003)
+        if pts.shape[0] < 2:    # ignore 1 point lines
+            continue
+
+        rt = s['route_num']
+        if rt < 0:
+            rt = 0
+
+        pls[rt]['polystring'].append(pts)
+        pls[rt]['distance'] += s['distance']
+
+    features = []
+    for rtn, pl in pls.items():
+        mcoords = pl['polystring']
+        if not mcoords:
+            continue
+        bbox = [
+            np.amin([np.amin(coords[:, 0]) for coords in mcoords]),
+            np.amin([np.amin(coords[:, 1]) for coords in mcoords]),
+            np.amax([np.amax(coords[:, 0]) for coords in mcoords]),
+            np.amax([np.amax(coords[:, 1]) for coords in mcoords]),
+        ]
+        props = {
+            'name': activity.name,
+            'avatar': activity.athlete.profile_medium,
+            'id': activity._id,
+            'bbox': bbox,
+            'start_date': activity.start_date.timestamp(),
+            'route': (rt_names[rtn - 1]
+                      if rtn > 0 else 'off'),
+            'distance': pl['distance'],
+            'on_route': bool(rtn > 0)
+        }
+        # convert for geojson
+        pts = [coords.tolist() for coords in mcoords]
+        geometry = geojson.MultiLineString(coordinates=pts, precision=5)  # 1m
+        ft = geojson.Feature(geometry=geometry, properties=props)
+        features.append(ft)
+
+    if collect:
+        return geojson.FeatureCollection(features)
+
+    return features
+
+
+def activities_to_geojson(activities=None, filename=None):
+
+    if not activities:
+        activities = db.session.query(Activity)
+        activities = activities.options(joinedload(Activity.athlete))
+
+    current_app.logger.info('')
+
+    feature_list = []
+    for i, activity in enumerate(activities):
+        current_app.logger.info(f'Making GEOJSON LS for activity [{i}]: '
+                                f'{activity._id}: {activity.name}')
+        features = activity_to_geojson_features(activity, collect=False)
+        feature_list.extend(features)
+
+    fcollection = geojson.FeatureCollection(feature_list)
+
+    if filename:
+        with open(filename, 'w') as fp:
+            geojson.dump(fcollection, fp)
+        return 'Done.'
+        
+    return fcollection
