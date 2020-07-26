@@ -14,8 +14,7 @@ from sqlalchemy.orm import joinedload
 # from app.auth import auth.oauth
 # import app.auth as auth
 import app.utils as utils
-from app.activities import (save_activity, process_event_id, process_range,
-                            process_athletes)
+import app.activities as activities
 from app.models import db, admin_required, Athlete, StravaEvent, Activity
 
 admin = Blueprint('admin', __name__)
@@ -33,7 +32,7 @@ def dict_gen(model_query):
 def fetch_activity(activity_id):
     owner_id = request.args.get('owner') or current_user._id
     timestamp = request.args.get('timestamp')
-    save_activity(activity_id, owner_id, timestamp=timestamp)
+    activities.save_activity(activity_id, owner_id, timestamp=timestamp)
     return redirect(url_for('main.map', activity=activity_id))
 
 
@@ -42,25 +41,46 @@ def fetch_activity(activity_id):
 def check_event(event_id):
     if not event_id:
         abort(404)
-    return process_event_id(int(event_id))
+    return activities.process_event_id(int(event_id))
 
 
 @admin.route('/check_events')
 @admin_required
 def check_events():
-    prange = process_range(**request.args)
-    return jsonify(prange)
+    erange = activities.process_range(**request.args)
+    return jsonify(erange)
+
 
 @admin.route('/check_athletes')
 @admin_required
 def check_athletes():
-    return process_athletes(**request.args)
+    return activities.process_athletes(**request.args)
+
+
+@admin.route('/check_athlete/<int:id>')
+@admin_required
+def check_athlete(id):
+    resp = activities.process_athlete(id, **request.args)
+    db.session.commit()
+    return resp
+
+
+@admin.route('/process_activities')
+@admin_required
+def process_activities():
+    return activities.analyze_activities(**request.args)
+
+
+@admin.route('/create_multilinestring_map')
+@admin_required
+def process_multilinestring_map():
+    return activities.activities_to_geojson(
+        filename='static/routes/multilinestring_map.geojson', **request.args)
 
 
 @admin.route('/athletes')
 @admin_required
 def athletes():
-    
     athletes = Athlete.query.all()
     athlete_dicts = dict_gen(athletes)
     ext = request.args.get('ext')
@@ -76,7 +96,7 @@ def athletes():
 
 @admin.route('/activities')
 @admin_required
-def activities():
+def get_activities():
     # need to limit this
     activities = (db.session.query(Activity)
                   .options(joinedload(Activity.athlete))
@@ -150,6 +170,8 @@ def index():
 
     q = db.session.query(func.sum(Activity.moving_time)
                          .label("total_moving_time"),
+                         func.sum(Activity.on_course)
+                         .label("on_course_distance"),
                          func.sum(Activity.distance)
                          .label("total_distance"),
                          func.count(distinct(Activity.athlete_id))
@@ -158,10 +180,13 @@ def index():
     result = q.first()
 
     current_app.logger.info(f'{result}')
-    stats['athletes contributing'] = result[2]
+    stats['athletes contributing'] = result[3]
     stats['moving time (hours)'] = "{:.1f}".format(int(result[0])/3600)
-    stats['total distance (km)'] = "{:.1f}".format(int(result[1])/1000)
-    stats['total distance (miles)'] = "{:.1f}".format(int(result[1])/1609.34)
+    stats['on course distance (km)'] = "{:.0f}".format(int(result[1])/1000)
+    stats['on course distance (miles)'] = \
+        "{:.0f}".format(int(result[1])/1609.34)
+    stats['total distance (km)'] = "{:.0f}".format(int(result[2])/1000)
+    stats['total distance (miles)'] = "{:.0f}".format(int(result[2])/1609.34)
 
     incomplete = Athlete.query.filter(Athlete.auth_granted == 0)
     incomplete_table = AthleteTable(incomplete)
