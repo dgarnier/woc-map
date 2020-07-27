@@ -310,8 +310,8 @@ def activity_to_geojson_features(activity, collect=True):
     if not (activity and activity.analysis):
         return []
 
-    segments = activity.analysis['segments']
-    rts = set([int(s['route_num']) for s in segments if s['route_num'] > 0] + [0])
+    segs = activity.analysis['segments']
+    rts = set([int(s['route_num']) for s in segs if s['route_num'] > 0] + [0])
     pls = {rt: {'distance': 0, 'polystring': []} for rt in rts}
     for s in activity.analysis.get('segments'):
         # Ramer-Douglas-Peucker reduction (epsilon=?) roughly 20m
@@ -400,3 +400,71 @@ def activities_to_geojson(activities=None, filename=None):
             lock.release()
 
     return fcollection
+
+
+def activity_to_heatmap_points(activity, jsonify=True):
+
+    if isinstance(activity, int):
+        activity = (Activity.query
+                    .get(activity))
+
+    if not (activity and activity.analysis):
+        return None
+
+    aa = activity.analysis
+    heat_pts = analysis.values_to_heatmap_points(aa['coordinates'],
+                                                 aa['dist_to_rtes'],
+                                                 aa['deltas'])
+
+    if not jsonify:
+        return heat_pts
+
+    return heat_pts.tolist()
+
+
+def activities_to_heatmap(activities=None, filename=None):
+    import numpy as np
+    import json
+    from filelock import Timeout, FileLock
+
+    if filename:
+        from os.path import dirname, relpath, join
+        filepath = join(dirname(relpath(__file__)), filename)
+        lockpath = filepath + '.lock'
+        try:
+            lock = FileLock(lockpath, timeout=.1)
+            lock.acquire()
+        except Timeout:
+            return 'Already doing this.', 503
+
+    try:
+
+        if not activities:
+            activities = db.session.query(Activity)
+
+        heatmap_pts_arrays = []
+        for i, activity in enumerate(activities):
+            current_app.logger.info(f'Making HEATMAP PTS for activity [{i}]: '
+                                    f'{activity._id}: {activity.name}')
+            heatmap_pts = activity_to_heatmap_points(activity, jsonify=False)
+            if heatmap_pts is not None:
+                # print(heatmap_pts.shape)
+                heatmap_pts_arrays.append(heatmap_pts)
+
+        heatmap_pts = np.concatenate(heatmap_pts_arrays)
+        #print(heatmap_pts.shape)
+        heatmap_json = [(round(pt[0], 4), round(pt[1], 4), round(pt[2], 1))
+                        for pt in heatmap_pts]
+
+        if filename:
+            from os.path import dirname, relpath, join
+            filepath = join(dirname(relpath(__file__)), filename)
+            with open(filepath, 'w') as fp:
+                json.dump(heatmap_json, fp)
+            return 'Done.'
+
+    finally:
+        if filename:
+            lock.release()
+
+    return heatmap_json

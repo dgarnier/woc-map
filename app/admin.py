@@ -78,6 +78,13 @@ def process_multilinestring_map():
         filename='static/routes/multilinestring_map.geojson', **request.args)
 
 
+@admin.route('/create_heatmap')
+@admin_required
+def process_heatmap():
+    return activities.activities_to_heatmap(
+        filename='static/routes/heatmap.json', **request.args)
+
+
 @admin.route('/athletes')
 @admin_required
 def athletes():
