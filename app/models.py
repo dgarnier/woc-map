@@ -170,11 +170,11 @@ def compare_dicts_with_ndarrays(dict_a, dict_b):
                 if dict_a[key] != dict_b[key]:
                     return False
             except ValueError:
-                try:
-                    if not np.array_equal(dict_a[key], dict_b[key]):
-                        return False
-                except:
+                # try:
+                if not np.array_equal(dict_a[key], dict_b[key]):
                     return False
+                # except:
+                #     return False
         return True
     else:
         return dict_a == dict_b

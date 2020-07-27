@@ -1,11 +1,11 @@
 import requests
 import time
-import os
+# import os
 
 with requests.Session() as s:
     for i in range(1800, 0, -1):
         r = s.get(f'http://app.wheelsofchange.us/admin/check_event/{i}',
-                    )
+                  )
         answer = r.text
         print(f'{i}, {answer[:50]}')
         time.sleep(.25)

@@ -1,13 +1,13 @@
 # this only returns json data for use in javascript displays
-from datetime import datetime
+# from datetime import datetime
 from flask import Blueprint, jsonify
 from flask_login import login_required, current_user
 
-from app.models import db, admin_required, Athlete, Activity, get_or_create, Point
-from app.utils import hashtags
-from app.auth import oauth
+# from app.models import db, admin_required, Athlete, Activity, get_or_create
+# from app.utils import hashtags
+# from app.auth import oauth
 import app.activities
-import geojson
+# import geojson
 
 
 api = Blueprint('api', __name__)
