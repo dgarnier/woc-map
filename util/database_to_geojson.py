@@ -56,6 +56,16 @@ class Athlete(Base):
     wavier_verified = db.Column(db.Boolean, default=False)
     details = db.Column(db.JSON, nullable=True)
 
+    @property
+    def avatar_url(self):
+        if self.profile:
+            return self.profile
+        else:
+            i1 = self.firstname[0] if self.firstname else ''
+            i2 = self.lastname[0] if self.lastname else ''
+            return "https://ui-avatars.com/api/?bold=true&size=70" + \
+                f"&name={i1}%20{i2}&background=0D8ABC&color=fff"
+
     def get_id(self):
         return self._id
 
@@ -229,7 +239,7 @@ def activities_to_geojson():
 
         props = {
                  'name': activity.name,
-                 'avatar': activity.athlete.profile_medium,
+                 'avatar': activity.athlete.avatar_url,
                  'id': activity._id,
                  'bbox': [west, south, east, north],
                  'start_date': activity.start_date.timestamp(),
@@ -251,5 +261,5 @@ gjson = activities_to_geojson()
 
 gjstr = geojson.dumps(gjson)
 
-with open('activities.geojson', 'w') as f:
+with open('app/static/routes/activities_raw.geojson', 'w') as f:
     f.write(gjstr)

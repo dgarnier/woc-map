@@ -4,7 +4,7 @@ from flask import current_app
 import geojson
 # import geobuf
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import lazyload, joinedload
 from app.models import (db, Athlete, Activity, get_or_create,
                         Point, Tag, StravaEvent)
 from app.utils import hashtags
@@ -311,11 +311,11 @@ def activity_to_geojson_features(activity, collect=True):
         return []
 
     segments = activity.analysis['segments']
-    rts = set([s['route_num'] for s in segments if s['route_num'] > 0] + [0])
+    rts = set([int(s['route_num']) for s in segments if s['route_num'] > 0] + [0])
     pls = {rt: {'distance': 0, 'polystring': []} for rt in rts}
     for s in activity.analysis.get('segments'):
-        # Ramer-Douglas-Peucker reduction (epsilon=?) roughly 30m
-        pts = rdp(s['coordinates'], epsilon=.0003)
+        # Ramer-Douglas-Peucker reduction (epsilon=?) roughly 20m
+        pts = rdp(s['coordinates'], epsilon=.0002)
         if pts.shape[0] < 2:    # ignore 1 point lines
             continue
 
@@ -339,7 +339,7 @@ def activity_to_geojson_features(activity, collect=True):
         ]
         props = {
             'name': activity.name,
-            'avatar': activity.athlete.profile_medium,
+            'avatar': activity.athlete.avatar_url,
             'id': activity._id,
             'bbox': bbox,
             'start_date': activity.start_date.timestamp(),
@@ -361,25 +361,42 @@ def activity_to_geojson_features(activity, collect=True):
 
 
 def activities_to_geojson(activities=None, filename=None):
-
-    if not activities:
-        activities = db.session.query(Activity)
-        activities = activities.options(joinedload(Activity.athlete))
-
-    current_app.logger.info('')
-
-    feature_list = []
-    for i, activity in enumerate(activities):
-        current_app.logger.info(f'Making GEOJSON LS for activity [{i}]: '
-                                f'{activity._id}: {activity.name}')
-        features = activity_to_geojson_features(activity, collect=False)
-        feature_list.extend(features)
-
-    fcollection = geojson.FeatureCollection(feature_list)
+    from filelock import Timeout, FileLock
 
     if filename:
-        with open(filename, 'w') as fp:
-            geojson.dump(fcollection, fp)
-        return 'Done.'
-        
+        from os.path import dirname, relpath, join
+        filepath = join(dirname(relpath(__file__)), filename)
+        lockpath = filepath + '.lock'
+        try:
+            lock = FileLock(lockpath, timeout=.1)
+            lock.acquire()
+        except Timeout:
+            return 'Already doing this.', 503
+
+    try:
+
+        if not activities:
+            activities = db.session.query(Activity)
+            activities = activities.options(lazyload(Activity.athlete))
+
+        feature_list = []
+        for i, activity in enumerate(activities):
+            current_app.logger.info(f'Making GEOJSON LS for activity [{i}]: '
+                                    f'{activity._id}: {activity.name}')
+            features = activity_to_geojson_features(activity, collect=False)
+            feature_list.extend(features)
+
+        fcollection = geojson.FeatureCollection(feature_list)
+
+        if filename:
+            from os.path import dirname, relpath, join
+            filepath = join(dirname(relpath(__file__)), filename)
+            with open(filepath, 'w') as fp:
+                geojson.dump(fcollection, fp)
+            return 'Done.'
+
+    finally:
+        if filename:
+            lock.release()
+
     return fcollection

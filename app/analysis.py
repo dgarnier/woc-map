@@ -334,7 +334,7 @@ def activity_segment(pts, rtnumin, d2r, deltas):
     # recursively break into segments where the on
     # or off route is the same in a segment
     rtnum = np.abs(rtnumin)
-    rtnum[d2r > 500] *= -1
+    rtnum[d2r > 200] *= -1
     drt = rtnum[1:] - rtnum[:-1]
     rt_breaks = drt.nonzero()[0]  # gives the index of end of a section
     # check for short sections
@@ -385,7 +385,7 @@ def activity_segment(pts, rtnumin, d2r, deltas):
 
         segment = {
             'coordinates': pts[i1:i2, :],
-            'route_num': rtnum[br - 1],
+            'route_num': np.median(rtnum[i1:i2]),
             'distance': np.sum(deltas[i1+1:i2]),
             'offroute': d2r[i1:i2]
         }

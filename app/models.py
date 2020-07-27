@@ -63,6 +63,16 @@ class Athlete(db.Model, UserMixin):
     wavier_verified = db.Column(db.Boolean, default=False)
     details = db.Column(db.JSON, nullable=True)
 
+    @property
+    def avatar_url(self):
+        if self.profile:
+            return self.profile
+        else:
+            i1 = self.firstname[0] if self.firstname else ''
+            i2 = self.lastname[0] if self.lastname else ''
+            return "https://ui-avatars.com/api/?bold=true&size=70" + \
+                f"&name={i1}%20{i2}&background=0D8ABC&color=fff"
+
     def get_id(self):
         return self._id
 
@@ -159,7 +169,7 @@ def compare_dicts_with_ndarrays(dict_a, dict_b):
             try:
                 if dict_a[key] != dict_b[key]:
                     return False
-            except ValueError as e:
+            except ValueError:
                 try:
                     if not np.array_equal(dict_a[key], dict_b[key]):
                         return False

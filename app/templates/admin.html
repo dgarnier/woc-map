@@ -92,12 +92,12 @@
     </div>
     <h2>Some admin functions</h2>
     <ul>
-        <li><a href="{{ url_for('.athletes', ext='csv') }}">"Readable Athletes (CSV)</a></li>
+        <li><a href="{{ url_for('.athletes', ext='csv') }}">Athletes w/Auth tokens (CSV)</a></li>
     <!-- 
         <li><a href="{{ url_for('.athletes', ext='csv', has_auth=0) }}">"No auth token" Athletes (CSV)</a></li>
     -->
         <li><a href="{{ url_for('strava.club_api', api='members.csv') }}">Strava Club Members (CSV)</a></li>
-        <li><a href="{{ url_for('.activities', ext='csv') }}">"Activities List (CSV)</a></li>
+        <li><a href="{{ url_for('.get_activities', ext='csv') }}">Activities List (CSV)</a></li>
     </ul>
 </div>
 <div class="center">

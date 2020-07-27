@@ -24,6 +24,7 @@ awsebcli = "*"
 virtualenvwrapper = "*"
 geobuf = "*"
 rdp = "*"
+lockfile = "*"
 
 [requires]
 python_version = "3.7"

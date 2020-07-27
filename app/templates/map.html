@@ -225,6 +225,82 @@
     }
 </script>
 <script>
+    function multilinestring_layer() {
+        var popup_activities = L.popup();
+        var layer = L.geoJSON();
+
+        const colors = [
+            'green', 'red', 'brown', '#0000CC', 'magenta'
+        ];
+
+        const rainbow_pallet = [
+            '#EE82EE', '#0000FF', '#008000', '#FFFF00',
+            '#FFA500', '#FF0000'
+        ]
+
+        function add_geojson(name) {
+            const urlbase = "{{ url_for('static', filename='routes') }}";
+            const url = `${urlbase}/${name}.geojson`
+            // return a promise
+            return $.ajax({
+                url: url,
+                timeout: 3000,
+                dataType: "json",
+                tryCount: 0,
+                retryLimit: 5,
+                success: function (json) {
+                    var gJ = L.geoJson(json, {
+                        style: (feature) => {
+                            var style = {
+                                'color': colors[feature.properties.id % colors.length]
+                            };
+                            if (feature.properties.on_route) {
+                                style.weight = 4;
+                                style.opacity = 1;
+                            } else {
+                                style.weight = 1;
+                                style.dashArray = "5 5";
+                                style.opacity = 0.5;
+                            }
+
+                            return style;
+                        },
+                        onEachFeature: (activity, layr) => {
+                            layr.on('click', (e) => {
+                                popup_activities
+                                    .setLatLng(e.latlng)
+                                    .setContent(
+                                        `<img src="${activity.properties.avatar}"` +
+                                        'class="avatar-circled">'
+                                    )
+                                    .openOn(map);
+                                L.DomEvent.stopPropagation(e);
+                            })
+                        }
+                    }).addTo(layer);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    if (textStatus == 'timeout') {
+                        this.tryCount++;
+                        if (this.tryCount <= this.retryLimit) {
+                            //try again 
+                            return $.ajax(this);
+                        }
+                        return;
+                    }
+                    if (xhr.status == 500) { //handle error 
+                    } else { //handle error 
+                    }
+                }
+            });
+        }
+
+        add_geojson("multilinestring_map")
+
+        return layer;
+    }
+</script>
+<script>
     const colors = ['green', 'red', 'brown', '#0000CC', 'magenta'];
 
     function my_activities_layer() {
@@ -309,12 +385,16 @@
     }
 
     routeLayer = get_routes_layer();
-    // routeLayer.addTo(map)
+    // routeLayer.addTo(map);
+
+    multistringLayer = multilinestring_layer();
+    multistringLayer.addTo(map);
 
     activitiesLayer = activities_layer();
-    activitiesLayer.addTo(map);
+    //activitiesLayer.addTo(map);
 
     var overlayMaps = {
+        "All Activities (adjusted)": multistringLayer,
         "All Activities (no clipping)": activitiesLayer,
         "WOC BLM Routes": routeLayer,
     };
@@ -383,7 +463,7 @@
         L.Control.Avatar = L.Control.extend({
             onAdd: function (map) {
                 var img = L.DomUtil.create('img');
-                img.src = "{{ user_info.profile_medium|safe }}";
+                img.src = "{{ user_info.avatar_url|safe }}";
                 img.style.borderRadius = '50%';
                 img.style.height = '70px';
                 return img;
