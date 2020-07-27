@@ -452,7 +452,7 @@ def activities_to_heatmap(activities=None, filename=None):
                 heatmap_pts_arrays.append(heatmap_pts)
 
         heatmap_pts = np.concatenate(heatmap_pts_arrays)
-        #print(heatmap_pts.shape)
+        # print(heatmap_pts.shape)
         heatmap_json = [(round(pt[0], 4), round(pt[1], 4), round(pt[2], 1))
                         for pt in heatmap_pts]
 

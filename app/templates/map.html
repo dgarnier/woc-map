@@ -304,11 +304,36 @@
     }
 </script>
 <script>
+    
+    const heated_metal = {
+        '0': 'Blue',
+        '0.2': 'Purple',
+        '0.4': 'Red',
+        '0.6': 'Yellow',
+        '1': 'White'
+    };
+
+    const spectrum = {
+    '0': 'Navy',
+    '0.2': 'Blue',
+    '0.3': 'Green',
+    '0.4': 'Yellow',
+    '0.5': 'Red',
+    '1.0': 'Red',
+    };
+
     function heatmap_layer() {
+
+        
+
         var layer = L.heatLayer([], 
             {
-                radius: 15,
-                blur: 10
+                radius: 8,
+                blur: 4,
+              //  gradient: spectrum,  // can change gradients.. but..
+                maxZoom: 15,   // this is the setting to change
+                                // darker / more is lower number
+
             });
 
         function add_heatmap(name) {
@@ -433,6 +458,7 @@
     // routeLayer.addTo(map);
 
     heatmapLayer = heatmap_layer();
+    heatmapLayer.addTo(map);
 
     multistringLayer = multilinestring_layer();
     multistringLayer.addTo(map);
@@ -457,14 +483,14 @@
 
     // Set up layers control
     var baseMaps = {
-        'Stamen.Watercolor'          : stamen_wc,           
+        'Stamen Watercolor'          : stamen_wc,           
         'CycOSM'                     : cyclosm   ,       
-        "Thunderforest.OpenCycleMap" : tf_ocm     ,      
-        "Thunderforest.Landscape"    : tf_lands    ,    
-        "CartoDB.VoyagerLabelsUnder" : carto_VLU    ,    
-        'Stadia.AlidadeSmooth'       : stadia_alidade,   
-        'Stadia.AlidadeSmoothDark'   : stadia_alidade_dark,
-        'MapBox OSM': osm_mapbox
+        "Thunderforest OpenCycleMap" : tf_ocm     ,      
+        "Thunderforest Landscape"    : tf_lands    ,    
+        "CartoDB Voyager"            : carto_VLU    ,    
+        'Stadia Alidade'             : stadia_alidade,   
+        'Stadia Alidade Dark'        : stadia_alidade_dark,
+        'MapBox Open Street Map'     : osm_mapbox
     };
 
     layer_control = L.control.layers(baseMaps, overlayMaps, { collapsed: true });
