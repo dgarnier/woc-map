@@ -63,11 +63,14 @@
 <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
     integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
     crossorigin=""></script>
-<script src="{{ url_for('static', filename='js/leaflet-providers.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-providers/1.10.1/leaflet-providers.min.js"
+    integrity="sha512-Ifxj89Ujg72gC/psKB9ystryRYiopmDud2EmNTKC9kz192aQwDKVK1FzWsyPc37tgU0UmRQlNnBM++ZnwIXJ9Q=="
+    crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/leaflet.restoreview.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap-notify.js') }}"></script>
 <script src="{{ url_for('static', filename='js/Leaflet.Control.Custom.js') }}"></script>
 <script src="{{ url_for('static', filename='js/Polyline.encoded.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 <!-- 
 <script src="{{ url_for('static', filename='js/leaflet-messagebox.js') }}"></script>
 <script src="{{ url_for('static', filename='js/easy-button.js') }}"></script>
@@ -301,6 +304,48 @@
     }
 </script>
 <script>
+    function heatmap_layer() {
+        var layer = L.heatLayer([], 
+            {
+                radius: 15,
+                blur: 10
+            });
+
+        function add_heatmap(name) {
+            const urlbase = "{{ url_for('static', filename='routes') }}";
+            const url = `${urlbase}/${name}.json`
+            // return a promise
+            return $.ajax({
+                url: url,
+                timeout: 3000,
+                dataType: "json",
+                tryCount: 0,
+                retryLimit: 5,
+                success: function (json) {
+                    layer.setLatLngs(json);                    
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    if (textStatus == 'timeout') {
+                        this.tryCount++;
+                        if (this.tryCount <= this.retryLimit) {
+                            //try again 
+                            return $.ajax(this);
+                        }
+                        return;
+                    }
+                    if (xhr.status == 500) { //handle error 
+                    } else { //handle error 
+                    }
+                }
+            });
+        }
+
+        add_heatmap("heatmap")
+
+        return layer;
+    }
+</script>
+<script>
     const colors = ['green', 'red', 'brown', '#0000CC', 'magenta'];
 
     function my_activities_layer() {
@@ -387,6 +432,8 @@
     routeLayer = get_routes_layer();
     // routeLayer.addTo(map);
 
+    heatmapLayer = heatmap_layer();
+
     multistringLayer = multilinestring_layer();
     multistringLayer.addTo(map);
 
@@ -396,6 +443,7 @@
     var overlayMaps = {
         "All Activities (adjusted)": multistringLayer,
         "All Activities (no clipping)": activitiesLayer,
+        "Activity Heatmap": heatmapLayer,
         "WOC BLM Routes": routeLayer,
     };
 

@@ -397,6 +397,26 @@ def activity_segment(pts, rtnumin, d2r, deltas):
     return segs, on_route
 
 
+def values_to_heatmap_points(pts, d2r, deltas):
+    # take the test points and make delta points
+    # this will be used for simpleheat
+    import scipy.interpolate
+
+    x = np.cumsum(deltas)
+    xnew = np.arange(0, x[-1], step=200)
+    lon = scipy.interpolate.interp1d(x, pts[:, 0])(xnew)
+    lat = scipy.interpolate.interp1d(x, pts[:, 1])(xnew)
+    d2n = scipy.interpolate.interp1d(x, d2r)(xnew)
+
+    inten = d2n*0.+1.
+    inten[d2n > 200] = .8
+    inten[d2n > 500] = .5
+    inten[d2n > 1000] = .2
+
+    heat_pts = np.column_stack([lat, lon, inten])
+    return heat_pts
+
+
 def generate_test_data():
     routes = read_routes_numpy()
     tpl = (
