@@ -402,13 +402,30 @@ def values_to_heatmap_points(pts, d2r, deltas):
     # this will be used for simpleheat
     import scipy.interpolate
 
+    delta_breaks = list((deltas > 2000).nonzero()[0])
     x = np.cumsum(deltas)
-    xnew = np.arange(0, x[-1], step=200)
-    lon = scipy.interpolate.interp1d(x, pts[:, 0])(xnew)
-    lat = scipy.interpolate.interp1d(x, pts[:, 1])(xnew)
-    d2n = scipy.interpolate.interp1d(x, d2r)(xnew)
 
-    inten = d2n*0.+1.
+    xs = np.split(x, delta_breaks)
+    lons = np.split(pts[:, 0], delta_breaks)
+    lats = np.split(pts[:, 1], delta_breaks)
+    d2rs = np.split(d2r, delta_breaks)
+
+    lonl = []
+    latl = []
+    d2nl = []
+    for x, lon, lat, d2r in zip(xs, lons, lats, d2rs):
+        if x.shape[0] < 3:
+            continue
+        xnew = np.arange(x[0], x[-1], step=200)
+        lonl.append(scipy.interpolate.interp1d(x, lon)(xnew))
+        latl.append(scipy.interpolate.interp1d(x, lat)(xnew))
+        d2nl.append(scipy.interpolate.interp1d(x, d2r)(xnew))
+
+    lon = np.concatenate(lonl)
+    lat = np.concatenate(latl)
+    d2n = np.concatenate(d2nl)
+
+    inten = np.ones(d2n.shape[0])
     inten[d2n > 200] = .8
     inten[d2n > 500] = .5
     inten[d2n > 1000] = .2
