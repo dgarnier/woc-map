@@ -2,4 +2,11 @@
 {% block head %}
 {{super()}}
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@wheelsofchange2">
+<meta name="twitter:title" content="Wheels of Change: #BlackLivesMatter Geo Art Map">
+<meta name="twitter:description"
+    content="Walk, run, bike, skate – whatever form of locomotion you like – to help power efforts to abolish racism and awaken an anti-racist America.">
+<meta name="twitter:image" 
+      content="{{ url_for('static', filename='img/geo_art_200727.png', _external=True) }}">
 {% endblock %}
