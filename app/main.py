@@ -29,17 +29,16 @@ def map():
                 for prop in [
                         'firstname',
                         'lastname',
-                        'profile',
-                        'profile_medium',
+                        'avatar_url',
                         'city',
                         'state',
                         'country'
                     ]
                 }
-        if not info['profile_medium']:
-            info['profile_medium'] = \
-                'https://ui-avatars.com/api/?bold=true&size=70' + \
-                f"&name={info['firstname']}+{info['lastname']}"
+        # if not info['profile_medium']:
+        #    info['profile_medium'] = \
+        #        'https://ui-avatars.com/api/?bold=true&size=70' + \
+        #        f"&name={info['firstname']}+{info['lastname']}"
         info['anonymous'] = False
 
     return render_template('map.html', user_info=info)
