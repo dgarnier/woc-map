@@ -12,8 +12,8 @@ db = ActiveAlchemy('mysql+pymysql://' +
 
 '''
 from sqlalchemy import create_engine
-from sqlalchemy.orm import (sessionmaker, relationship, backref, composite, 
-                            joinedload, lazyload)
+from sqlalchemy.orm import (sessionmaker, relationship, backref, composite,
+                            joinedload)  # , lazyload)
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy as db
 
@@ -148,7 +148,7 @@ class Tag(Base):
     __tablename__ = 'tag'
     _id = db.Column(db.String(32), primary_key=True)
     activities = relationship('Activity',
-                                 secondary=act_tag_assoc_table)
+                              secondary=act_tag_assoc_table)
 
 
 class Activity(Base):
@@ -157,7 +157,7 @@ class Activity(Base):
     athlete_id = db.Column(db.BigInteger, db.ForeignKey('athlete._id'),
                            nullable=False)
     athlete = relationship('Athlete',
-                              backref=backref('activities', lazy=True))
+                           backref=backref('activities', lazy=True))
     tags = relationship('Tag', secondary=act_tag_assoc_table)
     name = db.Column(db.Text())
     description = db.Column(db.Text, nullable=True)
@@ -214,7 +214,7 @@ class StravaEvent(Base):
 
 
 def activities_to_geojson():
-    colors = ['green', 'red', 'brown', '#0000CC', 'magenta']
+    # colors = ['green', 'red', 'brown', '#0000CC', 'magenta']
 
     i = 0
     featurelist = []
@@ -223,7 +223,8 @@ def activities_to_geojson():
     for activity in activities:
         # act_id = activity._id
         # ath_id = activity.athlete_id
-        # could put in the bounding box (sw to ne) ("bbox": [west, sout, east, north])
+        # could put in the bounding box (sw to ne)
+        # ("bbox": [west, sout, east, north])
 
         msp = activity.map_summary_polyline or activity.map_polyline
         if not msp:
