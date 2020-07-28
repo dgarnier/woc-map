@@ -280,17 +280,25 @@ def analyze_activity(activity):
     db.session.flush()
 
 
-def analyze_activities(page=1, before=None, after=None, per_page=100):
+def analyze_activities(all=False, page=None, before=None, after=None, per_page=100):
     try:
-        activities = db.session.query(Activity).paginate(
-            page=int(page), per_page=int(per_page))
+        activities = db.session.query(Activity)
+        if not all:  # only get new activities
+            activities = activities.filter(Activity.analysis == None)
+        if page:
+            activities = activities.paginate(
+                page=int(page), per_page=int(per_page)).items
+
     except (TypeError, ValueError):
         return 'Error', 400
-    for activity in activities.items:
+
+    i = 0
+    for activity in activities:
         analyze_activity(activity)
+        i += 1
 
     db.session.commit()
-    return 'Done'
+    return f'Analyzed {i} activities.'
 
 
 def activity_to_geojson_features(activity, collect=True):
