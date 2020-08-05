@@ -280,11 +280,12 @@ def analyze_activity(activity):
     db.session.flush()
 
 
-def analyze_activities(all=False, page=None, before=None, after=None, per_page=100):
+def analyze_activities(all=False, page=None, before=None, after=None,
+                       per_page=100):
     try:
         activities = db.session.query(Activity)
         if not all:  # only get new activities
-            activities = activities.filter(Activity.analysis == None)
+            activities = activities.filter(Activity.analysis == None)  # noqa E711
         if page:
             activities = activities.paginate(
                 page=int(page), per_page=int(per_page)).items
@@ -303,7 +304,7 @@ def analyze_activities(all=False, page=None, before=None, after=None, per_page=1
 
 def activity_to_geojson_features(activity, collect=True):
     import numpy as np
-    from rdp import rdp
+    from app.nb_rdp import rdp
 
     # global gRoutes
     # if not gRoutes:
@@ -323,7 +324,7 @@ def activity_to_geojson_features(activity, collect=True):
     pls = {rt: {'distance': 0, 'polystring': []} for rt in rts}
     for s in activity.analysis.get('segments'):
         # Ramer-Douglas-Peucker reduction (epsilon=?) roughly 20m
-        pts = rdp(s['coordinates'], epsilon=.0002)
+        pts = rdp(s['coordinates'], epsilon=20)
         if pts.shape[0] < 2:    # ignore 1 point lines
             continue
 
