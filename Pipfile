@@ -25,6 +25,8 @@ virtualenvwrapper = "*"
 geobuf = "*"
 rdp = "*"
 lockfile = "*"
+numba = "*"
+tbb = "*"
 
 [requires]
 python_version = "3.7"
