@@ -45,7 +45,7 @@
         }
 
         #mapid {
-        height: 100%;
+        height: 90%;
         width: 100%;
         /* display: inline-block; */
         }
@@ -54,6 +54,9 @@
             background: url("{{ url_for('static', filename='img/btn_strava_connectwith_light.svg') }}") no-repeat;
             */
             padding: 0px 0px;
+        }
+        #infoid {
+            height: 200px;
         }
     </style>
 {% endblock %}
@@ -575,4 +578,25 @@
 
 {% block content %}
 <div id="mapid"></div>
+<div id="infoid">
+<p>
+For the Wheels of Change Black Lives Matter Geo Art, we collected 545 activities (bike rides, runs, walks, rows, and
+swims) from 379 athletes. These activities included a total of 24,000 miles, with 20,000 of those miles being on-route
+for the letters spelling Black Lives Matter.
+</p>
+<p>
+On-route was determined by being within 200 meters of the pre-set routes for the letters. These tracks are displayed on
+a map of the world, focused on our letters from New York to Maine. For the Geo Art shown, two representations are
+superimposed.  
+</p>
+<p>
+The lower layer is known as a “heat map” of the activities.  In this heat map, the number of activities is mapped to a
+rainbow pallet with blue as low intensity and red as the highest intensity. Thus, one sees that the most traveled routes
+have the widest and reddest shapes (the B, M, A), and the least traveled are fainter blue or green (K, L, E).
+In addition to the heat map, the activities are also just plotted as lines on the map. Each activity is shown in one of
+5 rainbow colors picked arbitrarily. The off-route segments of the activities are shown as dashed lines. Clicking on a
+track will show the avatar of the contributing athlete.
+</p>
+</div>
+
 {% endblock %}
