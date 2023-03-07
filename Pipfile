@@ -5,6 +5,7 @@ ebcli = "*"
 virtualenv = "*"
 awsebcli = "*"
 virtualenvwrapper = "*"
+pipenv = "*"
 
 [packages]
 pymysql = "*"
@@ -30,7 +31,6 @@ rdp = {git = "https://github.com/dgarnier/rdp.git"}
 lockfile = "*"
 numba = "*"
 importlib_metadata = "*"
-tbb = "*"
 
 [requires]
 python_version = "3.8"
