@@ -24,7 +24,7 @@ flask-table = "*"
 flask-wtf = "*"
 polyline = "*"
 geojson = "*"
-numpy = "*"
+numpy = "<1.24"
 scipy = "*"
 geobuf = "*"
 rdp = {git = "https://github.com/dgarnier/rdp.git"}
