@@ -1,6 +1,10 @@
 [dev-packages]
 autopep8 = "*"
 matplotlib = "*"
+ebcli = "*"
+virtualenv = "*"
+awsebcli = "*"
+virtualenvwrapper = "*"
 
 [packages]
 pymysql = "*"
@@ -9,24 +13,24 @@ flask = "*"
 flask-login = "*"
 flask-sqlalchemy = "*"
 flask-bootstrap = "*"
-authlib = "*"
 gunicorn = "*"
 flup = "*"
 blinker = "*"
+authlib = "<1.0"
 loginpass = "*"
+# loginpass = {ref = "94-support-for-authlib-1.0.0", git = "https://github.com/birkjernstrom/loginpass.git"}
 flask-table = "*"
 flask-wtf = "*"
 polyline = "*"
 geojson = "*"
 numpy = "*"
 scipy = "*"
-awsebcli = "*"
-virtualenvwrapper = "*"
 geobuf = "*"
-rdp = "*"
+rdp = {git = "https://github.com/dgarnier/rdp.git"}
 lockfile = "*"
 numba = "*"
+importlib_metadata = "*"
 tbb = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"

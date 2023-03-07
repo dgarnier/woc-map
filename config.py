@@ -3,7 +3,7 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 try:
-    from secrets import Config
+    from woc_secrets import Config
     Config.SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 except ImportError:
