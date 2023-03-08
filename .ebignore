@@ -6,3 +6,6 @@
 .ipynb_checkpoints
 __pycache__
 .htaccess
+passenger_wsgi.py
+app.fcgi
+*.sqlite3

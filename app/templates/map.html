@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}Wheels of Change - Geo Art Map{% endblock %}
 
+
+
 {% block styles %}
     {{super()}}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-        crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha512-mD70nAW2ThLsWH0zif8JPbfraZ8hbCtjQ+5RU1m4+ztZq6/MymyZeB55pWsi4YAX+73yvcaJyk61mzfYMvtm9w=="
+        crossorigin="anonymous">
 
     <!-- Stylesheets for bootstrap notify -->
     <!--
@@ -65,17 +67,13 @@
 
 {% block scripts %}
 {{super()}}
-<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-    crossorigin=""></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-providers/1.10.1/leaflet-providers.min.js"
-    integrity="sha512-Ifxj89Ujg72gC/psKB9ystryRYiopmDud2EmNTKC9kz192aQwDKVK1FzWsyPc37tgU0UmRQlNnBM++ZnwIXJ9Q=="
-    crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha512-Dqm3h1Y4qiHUjbhxTuBGQsza0Tfppn53SHlu/uj1f+RT+xfShfe7r6czRf5r2NmllO2aKx+tYJgoxboOkn1Scg==" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet-providers@1.13.0/leaflet-providers.js" integrity="sha512-pb9UiEEi2JIxkMloqYnqgONe9CTcp2BWWq1Hbz60l7f3R3VhZ57dEE58Ritf/HgBw3o/5Scf5gg0T9V+tf48fg==" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js" integrity="sha512-KhIBJeCI4oTEeqOmRi2gDJ7m+JARImhUYgXWiOTIp9qqySpFUAJs09erGKem4E5IPuxxSTjavuurvBitBmwE0w==" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/leaflet.restoreview.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap-notify.js') }}"></script>
 <script src="{{ url_for('static', filename='js/Leaflet.Control.Custom.js') }}"></script>
 <script src="{{ url_for('static', filename='js/Polyline.encoded.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 <!-- 
 <script src="{{ url_for('static', filename='js/leaflet-messagebox.js') }}"></script>
 <script src="{{ url_for('static', filename='js/easy-button.js') }}"></script>

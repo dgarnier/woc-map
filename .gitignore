@@ -11,4 +11,5 @@ woc_secrets.py
 flask_console.log
 node_modules
 event_save_log.csv
+mysecrets.csv
 *.lock

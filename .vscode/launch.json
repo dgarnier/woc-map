@@ -22,7 +22,6 @@
                 "FLASK_APP": "app.py",
                 "FLASK_CONFIG_ENV": "development",
                 "FLASK_DEBUG": "1",
-                "SERVER_NAME": "app.wheelsofchange.us"
             },
             "args": [
             ],
