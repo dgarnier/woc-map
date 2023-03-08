@@ -1,14 +1,7 @@
 import os
 from app import create_app
 
-
-# os.environ['FLASK_ENV'] = 'staging'
-# os.environ['FLASK_CONFIG'] = 'staging'
-# os.environ['FLASK_DEBUG'] = '1'
-
-# application = create_app('staging')
-
-application = create_app(os.environ.get('FLASK_ENV', 'default'))
+application = create_app(os.environ.get('FLASK_APP_ENV', 'production'))
 application.debug = True
 
 if os.environ.get('SERVER_NAME'):

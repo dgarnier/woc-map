@@ -37,8 +37,8 @@ class TestingConfig(Config):
 
 
 class StagingConfig(Config):
-    DEBUG = True
-    # SQLALCHEMY_ECHO = True
+    FLASK_DEBUG = True
+    SQLALCHEMY_ECHO = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('STAGING_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'stage_app.sqlite3')
 

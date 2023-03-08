@@ -15,7 +15,7 @@ def cvsfileify(dict_list, keys, filename):
     csv_string = output.getvalue()
     mem = io.BytesIO(csv_string.encode('utf-8'))
     return send_file(mem, as_attachment=True,
-                     attachment_filename=filename,
+                     download_name=filename,
                      mimetype='text/csv'
                      )
 
