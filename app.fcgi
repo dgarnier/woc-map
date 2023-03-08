@@ -7,7 +7,7 @@ import logging
 from app import create_app
 
 
-os.environ['FLASK_ENV'] = 'production'
+os.environ['FLASK_APP_ENV'] = 'production'
 os.environ['FLASK_DEBUG'] = '1'
 
 app = create_app('production')

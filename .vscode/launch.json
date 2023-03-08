@@ -16,14 +16,15 @@
             "name": "Flask: development",
             "type": "python",
             "request": "launch",
-            "module": "flask",
+            "module": "application",
+            "console": "integratedTerminal",
             "env": {
                 "FLASK_APP": "app.py",
-                "FLASK_ENV": "development",
-                "FLASK_DEBUG": "1"
+                "FLASK_CONFIG_ENV": "development",
+                "FLASK_DEBUG": "1",
+                "SERVER_NAME": "app.wheelsofchange.us"
             },
             "args": [
-                "run"
             ],
             "jinja": true
         },
@@ -34,7 +35,7 @@
             "module": "flask",
             "env": {
                 "FLASK_APP": "application.py",
-                "FLASK_ENV": "testing",
+                "FLASK_APP_ENV": "testing",
                 "FLASK_DEBUG": "1"
             },
             "args": [

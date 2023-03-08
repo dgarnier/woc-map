@@ -89,12 +89,12 @@ def check_and_make_subscription():
             current_app.logger.debug(f'Unexpected subscription[{sub["id"]}]: '
                                      f'{sub["callback_url"]} != {callback_url}'
                                      )
-            if current_app.config.get('FLASK_ENV') == 'production':
+            if current_app.config.get('FLASK_APP_ENV') == 'production':
                 # production server rules!
                 delete_subscription(sub["id"])
             else:
                 current_app.logger.info(
-                    f"OK! I'm {current_app.config.get('FLASK_ENV')}, "
+                    f"OK! I'm {current_app.config.get('FLASK_APP_ENV')}, "
                     "not production server.")
                 return
     else:
