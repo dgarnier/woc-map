@@ -2,25 +2,20 @@
 import polyline
 import geojson
 from datetime import datetime
-'''
-from active_alchemy import ActiveAlchemy
-
-
-db = ActiveAlchemy('mysql+pymysql://' +
-                   '***REMOVED***_user:***REMOVED***@wheelsofchange.us' +
-                   '/***REMOVED***')
-
-'''
 from sqlalchemy import create_engine
 from sqlalchemy.orm import (sessionmaker, relationship, backref, composite,
                             joinedload)  # , lazyload)
 from sqlalchemy.ext.declarative import declarative_base
 import sqlalchemy as db
+import os
+import sys
 
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://' + \
-    '***REMOVED***_user:***REMOVED***@wheelsofchange.us' + \
-    '/***REMOVED***'
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+import woc_secrets
 
+SQLALCHEMY_DATABASE_URI = woc_secrets.Config.PRODUCTION_DATABASE_URL
 
 # ----- This is related code -----
 engine = create_engine(SQLALCHEMY_DATABASE_URI, echo=True)

@@ -6,11 +6,19 @@
 integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
 crossorigin=""/>
  <!-- Make sure you put this AFTER Leaflet's CSS -->
-<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-   crossorigin=""></script>
-<script src="https://unpkg.com/leaflet-gpx@1.5.0/gpx.js"></script>
-<script src="https://github.com/Oliv/leaflet-polycolor/raw/master/dist/leaflet-polycolor.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha512-Dqm3h1Y4qiHUjbhxTuBGQsza0Tfppn53SHlu/uj1f+RT+xfShfe7r6czRf5r2NmllO2aKx+tYJgoxboOkn1Scg==" 
+    crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet-providers@1.13.0/leaflet-providers.js"
+    integrity="sha512-pb9UiEEi2JIxkMloqYnqgONe9CTcp2BWWq1Hbz60l7f3R3VhZ57dEE58Ritf/HgBw3o/5Scf5gg0T9V+tf48fg=="
+    crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet-gpx@1.5.0/gpx.js" 
+    integrity="sha512-4NyeKe9NzlEGYyHfoGQ0Y/1k9R9NzO5vCE+F6gTK9oBUCF5fzD+FhfqO05hj32GPyEQo7TKi2qvoCdMs/Egwbw==" 
+    crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet-polycolor@2.0.3/dist/leaflet-polycolor.min.js" 
+    integrity="sha512-Z+Hy9smPjrVxUCu/ONya1C9w3Qqd65yt7LYWYsWgs8OaQdAdhe4W7N0JW3CBNt3+ZnAYAzrkNkt6vuf9RGn4Fw==" 
+    crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/leaflet-hash.js') }}"></script>
 {% endblock %}
 
 {% block styles %}

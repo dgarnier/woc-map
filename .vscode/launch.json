@@ -20,7 +20,7 @@
             "console": "integratedTerminal",
             "env": {
                 "FLASK_APP": "app.py",
-                "FLASK_CONFIG_ENV": "development",
+                "FLASK_APP_ENV": "development",
                 "FLASK_DEBUG": "1",
             },
             "args": [
