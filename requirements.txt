@@ -40,7 +40,7 @@ pycparser==2.21
 pymysql==1.0.2
 pytz==2022.7.1
 git+https://github.com/dgarnier/rdp.git@f203dc2898fd941cb741a65e713f4ecb53f77c1c#egg=rdp
-requests==2.28.2
+requests==2.31.0
 scipy==1.10.1
 setuptools==67.5.1
 six==1.16.0
