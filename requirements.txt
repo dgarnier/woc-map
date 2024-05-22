@@ -37,7 +37,7 @@ numpy==1.23.5
 polyline==2.0.0
 protobuf==4.22.0
 pycparser==2.21
-pymysql==1.0.2
+pymysql==1.1.1
 pytz==2022.7.1
 git+https://github.com/dgarnier/rdp.git@f203dc2898fd941cb741a65e713f4ecb53f77c1c#egg=rdp
 requests==2.31.0
