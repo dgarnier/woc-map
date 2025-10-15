@@ -1,6 +1,6 @@
 -i https://pypi.org/simple
 alembic==1.10.1
-authlib==0.15.6
+authlib==1.6.5
 babel==2.12.1
 blinker==1.5
 certifi==2022.12.7
