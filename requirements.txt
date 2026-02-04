@@ -35,7 +35,7 @@ markupsafe==2.1.2
 numba==0.56.4
 numpy==1.23.5
 polyline==2.0.0
-protobuf==4.22.0
+protobuf==6.33.5
 pycparser==2.21
 pymysql==1.0.2
 pytz==2022.7.1
